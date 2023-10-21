@@ -1,7 +1,7 @@
 <template>
   <div v-if="visible" class="app-t-modal">
     <div class="app-modal-content">
-      <div class="app-modal-header">Search Member</div>
+      <div class="app-modal-header">사원 검색</div>
       <div class="app-modal-body">
         <div class="a-m-search">
           <select class="m-s-select" id="s-condition" name="searchCondition" v-model="selectedCondition" style="text-align:left; width:80px;">
@@ -9,8 +9,8 @@
             {{ option.text }}
             </option>
 					</select>
-          <input class="s-selForm" v-model="searchValue" @keyup.enter="searchMember()" placeholder="부서/사원명만 검색 가능"/>
-          <button class="m-i-search" @click="searchMember">Search</button>
+          <input class="s-selForm" v-model="searchValue" @keyup.enter="searchMember()" placeholder="부서/사원명만 검색"/>
+          <button class="m-i-search" @click="searchMember">검색</button>
         </div>
         <div class="a-m-list">
           <table class="m-s-list-table">
@@ -28,8 +28,8 @@
         </div>
       </div>
       <div class="app-modal-footer">
-        <button class="m-confirm-btn" @click="confirmMember">Confirm</button>
-        <button class="m-cancel-btn" @click="closeModal">Cancel</button>
+        <button class="m-confirm-btn" @click="confirmMember">확인</button>
+        <button class="m-cancel-btn" @click="closeModal">취소</button>
       </div>
     </div>
   </div>
@@ -162,54 +162,72 @@ export default {
 }
 
 .app-modal-content {
-  width: 300px;
+  width: 260px;
+  height: 360px;
   background: #fff;
-  border-radius: 10px;
+  border-radius: 21px;
   text-align: center;
-  padding: 20px;
+  padding: 16px 28px 26px 23px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.app-modal-header,
+.app-modal-header {
+  margin-bottom: 15px;
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #1c201c9e;
+}
 .app-modal-footer {
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .a-m-search {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
+  /*justify-content: space-between;*/
+  margin-bottom: 10px;
   gap: 5px;
 }
 
 .s-selForm {
-  flex-grow: 1;
+  border-radius: 8px;
+  padding-left: 10px;
+  width: 118px;
+  border: 1px solid #ccc;
+  height: 29px;
+  font-size: 12px;
 }
 
 .m-i-search {
-  padding: 8px 10px;
-  background-color: #007BFF;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
+  padding: 6px 6px;
+  color: #979696;
+  border: 1px solid #d0d5d0b3;
+  border-radius: 6px;
   cursor: pointer;
+  background-color: #d0d5d042;
+  font-size: 11px;
 }
 
 .a-m-list {
   overflow-y: auto;
-  height: 150px;
+  height: 99px;
+  width: 260px;
   border: 1px solid #ccc;
-  margin-bottom: 15px;
+  padding: 10px 0px;
+  border-radius: 11px;
+  letter-spacing: 0px;
+  font-weight: normal;
+  font-size: 13px;
 }
 
 .m-s-list-table {
-  width: 60%;
+  width: 49%;
   border-collapse: collapse;
-  margin-left: 55px;
+  margin-left: 66px;
 }
 .m-s-list-table td{
-  padding: 0px;
+  padding: 3px;
 }
 
 .m-s-list-table tr:hover {
@@ -218,32 +236,52 @@ export default {
 }
 
 .s-list-div {
-  margin-top: 15px;
+  margin-top: 10px;
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 11px 10px 4px 10px;
   overflow-y: auto;
-  height: 90px;
+  height: 67px;
+  border-radius: 11px;
+  width: 240px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  font-size: 13px !important;
+}
+.s-list-div div {
+  margin-bottom: 4px;
 }
 .s-list-div div:hover{
   cursor: pointer;
 }
 
+
 .m-confirm-btn,
 .m-cancel-btn {
-  padding: 8px 16px;
-  margin: 5px;
+  padding: 7px 17px;
+  color: #625252d6;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
-}
-
-.m-confirm-btn {
-  background-color: #007BFF;
-  color: #fff;
+  background-color: #cbd9cbeb;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-left: 12px;
 }
 
 .m-cancel-btn {
-  background-color: #ccc;
+  background-color: #cbd9cb57;
+  color: #625252d6;
+  border: 1px solid #cbd9cb57;
+}
+
+.m-s-select{
+  text-align: left;
+  width: 58px;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 12px;
+  height: 33px;
 }
 
 

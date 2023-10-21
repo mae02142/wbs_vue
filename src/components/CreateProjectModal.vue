@@ -2,16 +2,17 @@
     <div v-if="visible" class="create-modal">
       <div class="modal-content">
         <span @click="close" class="close">&times;</span>
-        <h3>Add New Project</h3>
+        <h3>프로젝트 생성</h3>
         <div class="m-container">
             <div class="m-left">
                 <div class="todo">
-                    <span>Project Title</span>
-                    <input v-model="project_title" placeholder="Enter Project Name"/>
+                    <span class="project-title">프로젝트명</span>
+                    <input v-model="project_title" placeholder="프로젝트명 입력"/>
                 </div>
             </div>
                 <div class="status">
-                    <select name="status" v-model="selectedStatus" v-bind="status">
+                    <span class="status-title">진행 상황</span>
+                    <select class="do-select" name="status" v-model="selectedStatus" v-bind="status">
                       <option v-for="option in statusOptions" :key="option.value" :value="option.value">
                       {{ option.text }}
                       </option>
@@ -27,7 +28,7 @@
                             <tbody class="s-body">
                                 <tr>
                                     <th>PM</th>
-                                    <td>{{ member.member_name }}</td>
+                                    <td class="pm-member">{{ member.member_name }}</td>
                                   </tr>
                                   <tr>
                                     <th>참여 인원</th>
@@ -37,7 +38,7 @@
                                           {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>
                                         </span>
                                         </div>
-                                        <span v-else>+add</span>
+                                        <span v-else class="member-add">+add</span>
                                       </td>
                                 </tr>
                                 <tr>
@@ -178,6 +179,7 @@
   
   <style scoped>
 
+
 .create-modal {
     display: flex;
     justify-content: center;
@@ -192,23 +194,40 @@
   }
   .modal-content {
     background-color: #ffffff;
-    padding: 20px;
-    border-radius: 1ch;
-    width: 450px;
+    padding: 27px 39px 28px 39px;
+    border-radius: 4ch;
+    width: 320px;
+  }
+
+  .modal-content h3 {
+    color: #030b01b8;
+    letter-spacing: 2px;
+    font-size: 13px;
+    margin: 40px 0px 3px 0px;
+    text-align: center;
+    padding: 5px 5px;
+    border-radius: 20px;
+    background: #ececec59;
   }
   .close {
     cursor: pointer;
     float: right;
-    font-size: 28px;
+    font-size: 21px;
     margin: 0 0 10px 10px;
   }
   
   .m-container{
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
   }
-  
+  .project-title {
+    margin: 20px 0px -3px 7px;
+    letter-spacing: 1px;
+    font-size: 12px;
+    color: #211f1fa8;
+    font-weight: 600;
+  }
   .todo, .todo-detail{
       display: flex;
       flex-direction: column;
@@ -219,18 +238,30 @@
 } 
 
 .todo input{
-    height: 30px;
-    border-radius: 1ch;
+    height: 23px;
+    border-radius: 7ch;
+    border: 2px solid #80808030;
+    padding: 2px 20px 2px 16px;
+    font-size: 12px;
+    letter-spacing: 1px;
 }
 .todo input:focus{
     border-color: rgb(94, 94, 214);
     border: none;
 }
 
-.status-detail{
-    border: 1px solid gray;
-    border-radius: 1ch;
+.status-title{
+    margin: 0px 0px 6px 6px;
+    font-weight: 600;
+    font-size: 12px !important;
+    color: #211f1fa8;
+    letter-spacing: 1px;
+    font-size: 13px;
+}
 
+.status-detail{
+    border: 2px solid #80808030;
+    border-radius: 2ch;
 }
 
 .status-table{
@@ -238,23 +269,47 @@
     padding: 10px;
 }
 .status{
-    margin-bottom: 40px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
 }
 
 .status-table th {
-    text-align: left;
-    padding: 10px;
+    padding: 10px 0px 10px 30px;
+    font-size: 12px;
+    letter-spacing: 1px;
 }
 
 .s-header{
-    border-bottom: 1px solid gray;
-    padding: 10px;
+    color: #211f1fa8;
+    padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    background: #80808014;
+    font-weight: 600;
 }
-
+.do-select{
+    height: 30px;
+    width: 100px;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: 2px solid #80808030;
+    color: #625151;
+}
+.pm-member{
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: normal;
+  padding-left: 4px;
+}
 .date-picker{
     border: none;
-    width: 100%;
-    height: 40px;
+    width: 66%;
+    height: 37px;
+    font-size: 11px;
+    letter-spacing: 1px;
 }
 
 .date-picker:hover{
@@ -264,34 +319,51 @@
 }
 
 .create-btn{
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 9px;
 }
 .create-btn button{
-    width: 65px;
+    width: 80px;
     padding: 7px;
     place-self: flex-end;
-    background-color: rgb(39, 93, 194);
-    color: #ffffff;
-    border: none;
-    border-radius: 1ch;
+    background-color: #cbd9cb4a;
+    color: #151212;
+    border: 2px solid #cbd9cb70;
+    border-radius: 2ch;
+    letter-spacing: 2px;
+    font-size: 11px;
 }
 
 .create-btn button:hover{
     cursor: pointer;
 }
 
+.click-add {
+  font-size: 12px;
+  letter-spacing: 0px;
+  font-weight: normal;
+  padding-left: 4px;
+}
 .click-add:hover{
   cursor: pointer;
   font-style: bold;
 }
 
 .s-body th{
-min-width: 80px;
+  min-width: 65px;
 }
 
 .selected-member{
   font-size: small;
+}
+.member-add {
+  border: 1px solid #cbd9cbeb;
+    background: #cbd9cbeb;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 12px;
+    letter-spacing: 3px;
 }
   </style>
   

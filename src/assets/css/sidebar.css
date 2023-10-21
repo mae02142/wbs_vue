@@ -1,16 +1,27 @@
 #sideBar {
-    background-color: rgb(201, 223, 245);
     float: left;
-    padding: 20px;
+    padding: 50px 0px 0px 30px;
     width: 130px;
     height: calc(100vh);
+    margin-top: -65px;
+    width: 200px;
+    line-height: 1.5;
+    background: #09550914;
+    border-right: 2px solid #09550914;
+    border-radius: 0px 20px 20px 0px;
 }
 
 #sideBar ul {
     list-style: none;
-    padding: 0;
+    padding: 11px 15px 15px 15px;
 }
 
+#sideBar ul li {
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    font-size: 14px;
+    color: #635f5f;
+}
 #sideBar a {
     font-style: normal;  /* 'none' 대신 'normal'을 사용해야 합니다. */
     text-decoration: none;
@@ -19,17 +30,32 @@
 
 .create-project{
     display: flex;
-    gap: 3px;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
 }
 
 .project-list{
-    margin-top: 10px;
+    margin-top: 20px;
     display: flex;
     gap: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
 }
 .project-list img, .create-project img{
     width: 20px;
     height: 20px;
     cursor: pointer;
+}
+
+.project-title.active {
+    font-weight: 600;
+    color: #3d6032b5;
+    background-color: rgb(167 199 167 / 14%);
+    border-radius: 20px;
+    padding: 5px 23px 5px 23px;
+    border: 1px solid rgb(0 128 0 / 0%);
 }
 

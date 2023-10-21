@@ -7,17 +7,18 @@
             <div class="m-left">
                 <div v-if="!isEditMode"></div>
                 <div v-else class="todo">
-                    <span>Modify Project Title</span>
+                    <span>프로젝트명</span>
                     <input v-model="project_title" placeholder="Modify Project Name"/>
                 </div>
             </div>
             <div class="status">
+              <span class="status-title">진행 상황</span>
               <select v-if="isEditMode" name="status" v-model="selectedStatus">
                 <option v-for="option in statusOptions" :key="option.value" :value="option.value">
                   {{ option.text }}
                 </option>
               </select>
-              <span v-else>{{ project.status }}</span>
+              <span class="status-project" v-else>{{ project.status }}</span>
             </div>
                 <div class="status-detail">
                     <div class="s-header"> 
@@ -29,7 +30,7 @@
                             <tbody class="s-body">
                                 <tr>
                                     <th>PM</th>
-                                    <td>{{ project.project_manager }}</td>
+                                    <td class="pm-member">{{ project.project_manager }}</td>
                                   </tr>
                                   <tr>
                                     <th>참여 인원</th>
@@ -68,10 +69,10 @@
                     @update-selected-members="updateSelectedMembers" :sendMemberName="selectedMembers">
                     </MemberSearchModal>
                     <div class="create-btn"> 
-                      <button v-if="!isEditMode&&this.loginMember.member_num==this.project.member_num" @click="enterEditMode">Modify</button>
+                      <button v-if="!isEditMode&&this.loginMember.member_num==this.project.member_num" @click="enterEditMode">수정</button>
                       <div v-else-if="isEditMode&&this.loginMember.member_num==this.project.member_num">
-                        <button @click="saveChanges">confirm</button>
-                        <button @click="close">cancel</button>
+                        <button @click="saveChanges">확인</button>
+                        <button class="cancel-btn" @click="close">취소</button>
                       </div>
                     </div>
         </div>
@@ -249,9 +250,15 @@
   }
   .modal-content {
     background-color: #ffffff;
-    padding: 20px;
-    border-radius: 1ch;
-    width: 450px;
+    padding: 29px;
+    border-radius: 3ch;
+    width: 350px;
+  }
+  .modal-content h2{
+    color: #2e2b2beb;
+    letter-spacing: 1px;
+    font-size: 18px;
+    margin: 25px 0px 30px 9px;
   }
   .close {
     cursor: pointer;
@@ -263,7 +270,7 @@
   .m-container{
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 10px;
   }
   
   .todo, .todo-detail{
@@ -275,43 +282,102 @@
     width: 99%;
 } 
 
-.todo input{
+.status select {
     height: 30px;
-    border-radius: 1ch;
+    width: 100px;
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 12px;
+    border: 2px solid #80808030;
+    color: #625151;
+}
+
+.todo span {
+    margin-left: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #373333e8;
+    letter-spacing: 1px;
+}
+
+.todo input{
+    height: 19px;
+    border-radius: 3ch;
+    border: 2px solid #80808030;
+    padding: 5px 0px 5px 14px;
+    color: #685a5a;
+    font-size: 12px;
+    letter-spacing: 0px;
 }
 .todo input:focus{
     border-color: rgb(94, 94, 214);
     border: none;
 }
-
+.pm-member{
+    letter-spacing: 1px;
+    font-size: 12px;
+    font-weight: 600;
+    padding-left: 2px;
+}
 .status-detail{
-    border: 1px solid gray;
-    border-radius: 1ch;
-
+    border: 2px solid #80808030;
+    border-radius: 2ch;
 }
 
 .status-table{
     width: 100%;
-    padding: 10px;
+    padding: 8px;
 }
 .status{
-    margin-bottom: 40px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
 }
 
+.status-title {
+    margin: 0px 0px 7px 9px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #373333e8;
+    letter-spacing: 1px;
+    font-size: 12px;
+}
+.status-project {
+    margin: 4px 0px 7px 0px;
+    color: #373333e8;
+    letter-spacing: 1px;
+    font-size: 11px;
+    padding: 5px 8px;
+    background: #efe6e65e;
+    width: 59px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid #b7b3b31a;
+    letter-spacing: 2px;
+}
 .status-table th {
-    text-align: left;
-    padding: 10px;
+    padding: 10px 0px 10px 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
 }
 
 .s-header{
-    border-bottom: 1px solid gray;
-    padding: 10px;
+    padding: 12px;
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    background: #80808014;
+    color: #373333e8;
+    font-weight: 600;
 }
 
 .date-picker{
     border: none;
-    width: 100%;
-    height: 40px;
+    width: 63%;
+    height: 35px;
+    font-size: 11px;
+    letter-spacing: 1px;
 }
 
 .date-picker:hover{
@@ -321,17 +387,24 @@
 }
 
 .create-btn{
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
 }
 .create-btn button{
-    width: 65px;
-    padding: 7px;
+    width: 56px;
+    padding: 7px 14px;
     place-self: flex-end;
-    background-color: rgb(39, 93, 194);
-    color: #ffffff;
-    border: none;
+    background-color: #cbd9cb38;
+    color: #151212c9;
+    border: 2px solid #cbd9cb52;
     border-radius: 1ch;
+    letter-spacing: 1px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.cancel-btn {
+  margin-left: 10px;
 }
 
 .create-btn button:hover{
@@ -344,7 +417,7 @@
 }
 
 .s-body th{
-min-width: 80px;
+  width: 46%;
 }
 
 .selected-member{
