@@ -72,6 +72,15 @@ export default {
         this.activeProjectIndex = index;
       }
     },
+    async getProjectList(){
+      try {
+        const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
+        this.projectList = response.data;
+        console.log("Get Projcet List >>>>>>>>", this.projectList)
+      } catch (error) {
+        console.log("Failed to Get Project List >>>>", error);
+      }
+    },
     selectProject(project) {
       if (!this.projectNum || this.projectNum !== project.project_num) {
         this.eventBus.emit('getTodoList', project);
