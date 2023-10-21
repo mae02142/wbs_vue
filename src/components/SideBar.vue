@@ -15,7 +15,7 @@
             </div>
             <div>
               <ul v-if="showProjects">                                                                                                   
-              <li v-for="project in projects" :key="project.project_num">
+              <li v-for="project in projectList" :key="project.project_num">
                 <span class="project-title" @click="selectProject(project)">{{ project.project_title }}</span>
               </li>
             </ul>
@@ -30,34 +30,23 @@
 import CreateProjectModal from "./CreateProjectModal.vue";
 import axios from "axios";
 import mixin from "../mixin";
-import { mapState } from "vuex";
 
 export default {
   name: 'SideBar',
   mixins:[mixin],
   components:{CreateProjectModal},
-
+  inject: ["eventBus"],
   data() {
     return {
+      projectList: [],
       showModal: false,
       showProjects: false,
-      member_num:''
     };
   },
   mounted(){
-    this.renderProjectList();
-  },
-  computed:{
-    ...mapState(['projectList', 'selectedProject']),
-    projects() {
-    return this.projectList;
-  }
+    this.getProjectList();
   },
   methods: {
-    forTest(temp){
-      console.log("key : " + temp);
-      this.key = temp;
-    },
     toggleProjects() {
       this.showProjects = !this.showProjects;
     },
@@ -68,22 +57,22 @@ export default {
       this.showModal = true;
     },
     handleProjectCreated(newProject) {
-    this.projects.push(newProject);
-    this.member_num = newProject.member_num;
-  },
-  async renderProjectList(){
-    try {
-      const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-          this.$store.dispatch('updateProjectsData', response.data);
-    } catch (error) {
-      console.log(error);
+      this.projects.push(newProject);
+    },
+    async getProjectList(){
+      try {
+        const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
+        this.projectList = response.data;
+        console.log("Get Projcet List >>>>>>>>", this.projectList)
+      } catch (error) {
+        console.log("Failed to Get Project List >>>>", error);
+      }
+    },
+    selectProject(project) {
+      this.eventBus.emit('getTodoList', project);
     }
-  },
-  selectProject(project) {
-    this.$store.commit('setSelectedProject', project);
-}
 
-}
+  }
 }
 </script>
 
