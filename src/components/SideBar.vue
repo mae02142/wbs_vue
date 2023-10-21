@@ -32,15 +32,15 @@
 import CreateProjectModal from "./CreateProjectModal.vue";
 import axios from "axios";
 import mixin from "../mixin";
-import { mapState } from "vuex";
 
 export default {
   name: 'SideBar',
   mixins:[mixin],
   components:{CreateProjectModal},
-
+  inject: ["eventBus"],
   data() {
     return {
+      projectList: [],
       showModal: false,
       showProjects: false,
       activeProjectIndex: -1,
@@ -48,19 +48,9 @@ export default {
     };
   },
   mounted(){
-    this.renderProjectList();
-  },
-  computed:{
-    ...mapState(['projectList', 'selectedProject']),
-    projects() {
-    return this.projectList;
-  }
+    this.getProjectList();
   },
   methods: {
-    forTest(temp){
-      console.log("key : " + temp);
-      this.key = temp;
-    },
     toggleProjects() {
       this.showProjects = !this.showProjects;
     },
@@ -81,20 +71,16 @@ export default {
       } else {
         this.activeProjectIndex = index;
       }
-  },
-  async renderProjectList(){
-    try {
-      const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-          this.$store.dispatch('updateProjectsData', response.data);
-    } catch (error) {
-      console.log(error);
+    },
+    async renderProjectList(){
+      try {
+        const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
+            this.$store.dispatch('updateProjectsData', response.data);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  },
-  selectProject(project) {
-    this.$store.commit('setSelectedProject', project);
-}
-
-}
+  }
 }
 </script>
 

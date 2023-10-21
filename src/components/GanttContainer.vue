@@ -16,6 +16,7 @@ export default {
     //   type: Object,      // 만약 selectedProject가 객체라면 type을 Object로 설정
     //   default: () => ({})  // 기본값을 빈 객체로 설정. 필요에 따라 수정 가능
     // }
+    projectList:[]
   },
   data () {
     return {
