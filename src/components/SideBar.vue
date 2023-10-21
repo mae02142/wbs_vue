@@ -23,7 +23,6 @@
               </ul>
             </div>
           </div>
-
     </nav>
   </aside>
 </template>
@@ -41,6 +40,7 @@ export default {
   data() {
     return {
       projectList: [],
+      projectNum: null,
       showModal: false,
       showProjects: false,
       activeProjectIndex: -1,
@@ -72,12 +72,10 @@ export default {
         this.activeProjectIndex = index;
       }
     },
-    async renderProjectList(){
-      try {
-        const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-            this.$store.dispatch('updateProjectsData', response.data);
-      } catch (error) {
-        console.log(error);
+    selectProject(project) {
+      if (!this.projectNum || this.projectNum !== project.project_num) {
+        this.eventBus.emit('getTodoList', project);
+        this.projectNum = project.project_num
       }
     }
   }
