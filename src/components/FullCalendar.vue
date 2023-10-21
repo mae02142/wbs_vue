@@ -4,24 +4,25 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
-import axios from 'axios';
 import CreateProjectModal from "./CreateProjectModal.vue";
 import mixin from "../mixin";
 
 export default {
   mixins:[mixin],
-
   components: {
     FullCalendar,
     CreateProjectModal,
   },
-
+  inject: ["eventBus"],
+  props: {
+    todoList: [],
+  },
   data () {
     return {      
+      // todoList: [], // db - todo list
+      //localTodoList: {...this.todoList},
       showModal: false,
-      selectedProject: [], // 선택된 프로젝트
-      projects: [], // db에서 가져온 project list를 가공해서 저장할 배열
-      todos: [], // db - todo list
+      isShow: true,
       calendarOptions: {
         plugins: [
           dayGridPlugin,
@@ -35,7 +36,7 @@ export default {
           right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
         },
         initialView: 'dayGridMonth',
-        events: [], // calendar에 뿌려줄 배열
+        events: this.todoList, // calendar에 뿌려줄 배열
         editable: false, // 일정 드래그 방지
         selectable: true,
         selectMirror: true,
@@ -43,22 +44,19 @@ export default {
         weekends: true,
         select: this.handleDateSelect,
         eventClick: this.handleEventClick,
-        eventsSet: this.setTodos,
+        eventsSet: this.setTodoList
       },
     }
   },
-
-  mounted() {},
-
+  mounted() {
+    document.test = this.$refs.cal;
+    this.eventBus.on('resetCalendar',this.test);
+  },
   methods: {
-    getTodo(value){
-      this.key = value;
-    },
-
-    setTodos() {
-      console.log('selected Todo >>>>>>>', this.$store.state.todoList)
-      this.todos = this.$store.state.todoList;
-      this.calendarOptions.events = this.todos;
+    setTodoList() {
+      console.log('Calendar Todo >>>>>>>', this.todoList)
+      // this.calendarOptions.events = [];
+      // this.calendarOptions.events = this.todoList;
     },
 
     handleDateSelect(selectInfo) {
@@ -88,9 +86,13 @@ export default {
     openModal() {
       this.showModal = true;
     },
-    handleProjectCreated(newProject) {
-      this.projects.push(newProject);
-    },
+    test(value){
+      this.$refs.cal.getApi().pauseRendering();
+      this.$refs.cal.getApi().destroy();
+      this.calendarOptions.events = value;
+      this.$refs.cal.buildOptions(this.calendarOptions);
+      this.$refs.cal.getApi().render();
+    }
   },
 }
 </script>
@@ -98,9 +100,12 @@ export default {
 <template>
   <div class='app'>
     <div class='app-main'>
+      <button @click="test">test</button>
       <FullCalendar
+        v-if="isShow"
         class='app-calendar'
         :options='calendarOptions'
+        ref="cal"
       >
         <template v-slot:eventContent='arg'>
           <b>{{ arg.timeText }}</b>
@@ -117,5 +122,5 @@ export default {
 </template>
 
 <style>
-  @import '../css/calendar.css';
+  @import '../assets/css/calendar.css';
 </style>
