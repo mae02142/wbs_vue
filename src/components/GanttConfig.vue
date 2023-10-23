@@ -1,5 +1,59 @@
 <template>
-  <div ref="gantt" class="gantt-c"></div>
+  <div>
+
+    <div class="custom-radio">
+            <input
+              type="radio"
+              id="scale1"
+              class="gantt_radio"
+              name="scale"
+              value="day"
+              v-model="selectedScale"
+            />
+            <label for="scale1">일별</label>
+  
+            <input
+              type="radio"
+              id="scale2"
+              class="gantt_radio"
+              name="scale"
+              value="week"
+              v-model="selectedScale"
+            />
+            <label for="scale2">주별</label>
+  
+            <input
+              type="radio"
+              id="scale3"
+              class="gantt_radio"
+              name="scale"
+              value="month"
+              v-model="selectedScale"
+            />
+            <label for="scale3">달별</label>
+  
+            <input
+              type="radio"
+              id="scale4"
+              class="gantt_radio"
+              name="scale"
+              value="quarter"
+              v-model="selectedScale"
+            />
+            <label for="scale4">분기별</label>
+  
+            <input
+              type="radio"
+              id="scale5"
+              class="gantt_radio"
+              name="scale"
+              value="year"
+              v-model="selectedScale"
+            />
+            <label for="scale5">연도별</label>
+        </div>
+    <div ref="gantt" class="gantt-c"></div>
+  </div>
 </template>
 
 <script>
@@ -9,12 +63,6 @@ import mixin from "../mixin";
 export default {
   name: "GanttConfig",
   mixins: [mixin],
-  data() {
-    return {
-      selectedScale: "day",
-      updatingTask: false,  // 중복 업데이트 방지 플래그
-    };
-  },
   props: {
     tasks: {
       type: Object,
@@ -25,12 +73,72 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      selectedScale: "day",
+      updatingTask: false,  // 중복 업데이트 방지 플래그
+    };
+  },
   computed: {
     loginMember() {
       return this.$store.state.loginMember;
     }
   },
+  watch: {
+    selectedScale(newValue) {
+      switch (newValue) {
+        case "day":
+          this.setDayScale();
+          break;
+        case "week":
+          this.setWeekScale();
+          break;
+        case "month":
+          this.setMonthScale();
+          break;
+        case "quarter":
+          this.setQuarterScale();
+          break;
+        case "year":
+          this.setYearScale();
+          break;
+      }
+    },
+  },
     methods: {
+      //selectedScale
+    setDayScale() {
+      gantt.config.scale_unit = "day";
+      gantt.config.date_scale = "%d %M";
+      gantt.config.subscales = [];
+      gantt.render();
+    },
+
+    setWeekScale() {
+      gantt.config.scale_unit = "week";
+      gantt.config.date_scale = "%W";
+      gantt.config.subscales = [{ unit: "day", step: 1, date: "%d %M" }];
+      gantt.render();
+    },
+
+    setMonthScale() {
+      gantt.config.scale_unit = "month";
+      gantt.config.date_scale = "%F, %Y";
+      gantt.config.subscales = [{ unit: "week", format: "Week #%W" }];
+      gantt.render();
+    },
+    setQuarterScale() {
+      gantt.config.scale_unit = "quarter";
+      gantt.config.date_scale = "%M";
+      gantt.config.subscales = [{ unit: "month", step: 1, date: "%M" }];
+      gantt.render();
+    },
+
+    setYearScale() {
+      gantt.config.scale_unit = "year";
+      gantt.config.date_scale = "%Y";
+      gantt.render();
+    },
       //todo 저장
       async saveTaskToServer(task) {
         try {
@@ -42,29 +150,71 @@ export default {
               todoDTO: task,
             }
           );
-          console.log(response.data);
+          console.log("saveTaskToServer>>",response.data);
           this.data=response.data;
 
         } catch (error) {
           console.log(error);
         }
       },
+      //todo 수정
+      async updateTaskOnServer(task) {
+        try {
+          const response = await axios.put("http://localhost:8030/api/updateTodo",
+            {
+              t_key: this.key,
+              todoDTO: task
+            });
+          console.log("updateTaskOnServer", response.data);
+        } catch (error) {
+          console.error("Failed to update task on server", error);
+        }finally{
+          this.updatingTask = false;  // 작업 업데이트가 완료된 후 플래그를 재설정
+        }
+      },
+      //todo 삭제
+      async deleteTaskonServer(task) {
+        try {
+          const response = await axios.delete("http://localhost:8030/api/deleteTodo",
+            {
+              t_key: this.key,
+              todoDTO: task
+            });
+            console.log("delete>>>",response.data);
+        } catch (error) {
+          console.error("Failed to delete task on server", error);
+        }
+      }
     },
 
     mounted: function () {
       gantt.config.date_format = "%Y-%m-%d";
       gantt.config.columns = [
-        { name: "todo_title", label: "Title", tree: true, width: 130 },
+        { name: "text", label: "Title", tree: true, width: 130 },
         { name: "member", label: "member", align: "center" },
         { name: "start_date", label: "Start time", align: "center" },
         { name: "end_date", label: "End time", align: "center" },
         { name: "add", label: "" },
       ];
       gantt.config.grid_width = 450;
+      gantt.config.scrollable = true;
+      gantt.config.scale_unit = "day";
+      gantt.config.show_links = false;
+
+      gantt.templates.lightbox_header = function (start_date, end_date, task) {
+        return (
+          gantt.templates.task_time(task.start_date, task.end_date, task) +
+          "&nbsp;" +
+          (
+            gantt.templates.task_text(task.start_date, task.end_date, task.text) ||
+            ""
+          ).substr(0, 70)
+        );
+      };
 
       //todo 추가 모달창 - 구성
       gantt.config.lightbox.sections = [
-        { name: "todo_title", height: 38, map_to: "todo_title", type: "textarea" }, //title
+        { name: "description", height: 38, map_to: "text", type: "textarea" }, //title
         { name: "content", height: 38, map_to: "content", type: "textarea" }, // Content
         { name: "project_manager", height: 16, type: "template", map_to: "project_manager"}, // PM
         { name: "member", height: 60, type: "template", map_to: "member"}, //manager
@@ -76,11 +226,10 @@ export default {
             { key: "done", label: "완료됨" },
           ],
         },
-        {
-          name: "period", height: 72, type: "time", map_to: "dedline", time_format: ["%Y", "%m", "%d"],
-        }, //Deadline
+        { name: "period", height: 72, type: "time", time_format: ["%Y", "%m", "%d"],
+        map_to:{start_date:"start_date",end_date:"end_date"}}, //Deadline
       ];
-      gantt.locale.labels.section_todo_title = "할 일";
+      gantt.locale.labels.section_description = "할 일";
       gantt.locale.labels.section_content = "세부 설명";
       gantt.locale.labels.section_project_manager = "PM";
       gantt.locale.labels.section_member = "담당자";
@@ -103,28 +252,43 @@ export default {
       };
 
       gantt.attachEvent("onLightboxSave", (id, task, is_new) => {
-        task.start_date = this.$store.getters.formatDate(task.start_date);
-        task.due_date = this.$store.getters.formatDate(task.end_date);
-        delete task.end_date;
-        console.log("라이트박스 task>>>", task);
         const sendtask = {
           todo_num: id,
-          todo_title: task.todo_title,
+          todo_title: task.text,
           status: task.status, 
-          start_date: task.start_date, 
-          due_date: task.due_date,
+          start_date: this.$store.getters.formatDate(task.start_date), 
+          due_date: this.$store.getters.formatDate(task.end_date),
           member_name: task.member,
           member_num: this.$store.state.loginMember.member_num,
           content: task.content
         };
-        console.log("is_new",is_new);
-        this.saveTaskToServer(sendtask);
-        return true; // 이를 반환하여 gantt가 작업을 저장하게 합니다.
+        if (is_new) {
+            this.saveTaskToServer(sendtask);
+          } else {
+            this.updateTaskOnServer(sendtask);
+          }
+          return true;
       });
+      gantt.attachEvent("onLightboxDelete", (id) => {
+      const task = gantt.getTask(id);
+      console.log("delete의 id로 task 뽑기",task);
+      const sendtask = {
+          todo_num: id,
+          todo_title: task.text,
+          status: task.status, 
+          start_date: this.$store.getters.formatDate(task.start_date), 
+          due_date: this.$store.getters.formatDate(task.end_date),
+          member_name: task.member,
+          member_num: this.$store.state.loginMember.member_num,
+          content: task.content
+        };
+        this.deleteTaskonServer(sendtask);
+      return true;
+      });
+
       gantt.createDataProcessor((entity, action, data, id) => {
         this.$emit(`${entity}-updated`, id, action, data);
       });
-      //document.querySelector(".gantt_radio[value='" + config.name + "']").checked = true;
 
       /////언어 설정하기
       gantt.i18n.setLocale("kr");
@@ -140,23 +304,56 @@ export default {
 
 <style>
 @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css";
-div[ref="gantt"] {
+.gantt-c {
   width: 100%;
   height: 800px;
 }
+
+/* /////////////////////////////////////////// radio */
+.custom-radio {
+    font-size: 11px;
+    color: #6953538d;
+    font-size: 11px;
+    color: #6953538d;
+    margin: 0px 30px 17px 0px;
+    float: right;
+}
+
+.custom-radio input[type="radio"] { /* 기본 라디오 버튼 숨김 */
+    display: none; 
+}
+
+.custom-radio label:before {
+    content: '';
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border: 2px solid #e3e5e7;
+    border-radius: 50%;
+    position: absolute;
+    left: 12px;
+    top: 1px;
+}
+
+.custom-radio label {
+    display: inline-block;
+    position: relative;
+    padding-left: 34px;
+    cursor: pointer;
+}
+
+.custom-radio input[type="radio"]:checked + label:before {
+    background-color: #56732e7a;
+}
+/* /////////////////////////////////////////// end radio */
+
 
 .gantt-c {
   min-height: 600px;
 }
 
-
 .gantt_row.odd{ /* 짝수 행마다 회색*/
     background-color:#f4f4fb4b;
-}
-
-.gantt_tree_content { /*줄임표를 사용하여 긴 텍스트 자르기*/
-    /* overflow:hidden;
-    text-overflow: ellipsis; */
 }
 
 .gantt_grid_data .gantt_row.odd:hover, .gantt_grid_data .gantt_row:hover,
@@ -245,11 +442,10 @@ div[ref="gantt"] {
 .gantt_task_progress { /* progress fill */
     background: #4472445e;
 }
+/*/////////////////// end task */
 
-/*/////////////////// task */
 
-
-/*////////////////// + modal */ 
+/*///////////////////////// +modal */ 
 .gantt_cal_light {
     -webkit-tap-highlight-color: transparent;
     background: #fff;
@@ -263,19 +459,18 @@ div[ref="gantt"] {
     z-index: 10001;
     width: 476px;
     height: 250px;
-    padding: 32px 13px 38px 13px;
+    padding: 32px 13px 44px 13px;
 }
-.gantt_cal_light .gantt_title {
-    font-size: 12px;
-    color: #736969b8;
-    letter-spacing: 2px;
-    background: #eceaea4f;
-    padding: 5px 10px;
+span.gantt_title {
+    letter-spacing: 3px;
+    padding: 10px 20px;
+    background: #8080800d;
     border-radius: 17px;
+    font-size: 11px;
+    color: #63606070;
 }
-
 .gantt_cal_ltitle {
-    padding: 30px 0px 10px 0px;
+    padding: 36px 0px 10px 0px;
     text-align: center;
     overflow: hidden;
     -webkit-border-top-left-radius: 6px;
@@ -357,8 +552,12 @@ div.gantt_cal_ltext.gantt_cal_template {
     letter-spacing: 1px;
 }
 
-.gantt_cal_light .gantt_btn_set {
-    margin: -13px 51px;
+div[role="button"][aria-label="저장"] {
+   margin-left: 123px !important;
+}
+
+.gantt_cal_light .gantt_btn_set {  /* btn 간격 */
+    margin: -14px 19px;
 }
 
 .gantt_btn_set {
@@ -412,17 +611,7 @@ div.gantt_cal_ltext.gantt_cal_template {
 .gantt_btn_set[role="button"][aria-label="삭제"] {
     float: inline-start !important;
 }
-
-/* select[aria-label="Years"] {
-    width: 61px !important;
-}
-select[aria-label="Months"] {
-    width: 100px !important;
-}
-select[aria-label="Days"] {
-    width: 46px !important;
-} */
- 
+/*///////////////////////// end +modal */ 
 
 /* delete modal in modal */
 .gantt_modal_box gantt-alert {

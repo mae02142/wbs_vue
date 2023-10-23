@@ -1,60 +1,72 @@
 <template>
   <div class="g-container">
-    <GanttConfig ref="GanttConfig" class="left-container" :tasks="tasks"></GanttConfig>
+    <GanttConfig ref="GanttConfig" 
+      class="left-container" 
+      :tasks="tasks"
+      @task-updated="handleTaskUpdated">
+    </GanttConfig>
   </div>
 </template>
 
 <script>
 import GanttConfig from './GanttConfig.vue';
 import axios from 'axios';
+import mixin from "../mixin";
+import { mapGetters } from 'vuex';
+import { gantt } from "dhtmlx-gantt";
 
 export default {
   name: 'GanttContainer',
   components: {GanttConfig},
+  mixins:[mixin],
   props: {
-    // selectedProject: {
-    //   type: Object,      // 만약 selectedProject가 객체라면 type을 Object로 설정
-    //   default: () => ({})  // 기본값을 빈 객체로 설정. 필요에 따라 수정 가능
-    // }
-    projectList:[]
+    project: Object,
   },
   data () {
     return {
-      project:'',
       tasks: {
-        data: [
-          //{id: 1, todo_title: '메일', member: 'aaa', start_date: '2023-10-14', end_date: '2023-10-15',duration: 1, progress: 0.6},
-          {id: 2, todo_title: '전자결재함', member: 'bbb', start_date: '2023-10-15', end_date: '2023-10-18',duration: 3, progress: 0.4}
-        ],
+        data: []
       },
       messages: []
     }
   },
-  // watch: {
-  //   // selectedProject prop의 변경을 감지
-  //   selectedProject(newProject) {
-  //     if (newProject && newProject.project_num) {
-  //       this.fetchProjectTasks(newProject.project_num);
-  //     }
-  //   }
-  // },
-  mounted() {
-    // if (this.selectedProject && this.selectedProject.project_num) {
-    //   this.fetchProjectTasks(this.selectedProject.project_num);
-    // }
+  computed: {
+    ...mapGetters(['selectedProject']),
   },
-
+  watch: {
+    selectedProject: {
+    handler(newProject) {
+      this.renderGanttChart(newProject);
+    },
+    deep: true,
+    immediate: true,
+    },
+  },
   methods: {
-    fetchProjectTasks(projectNum) {
-      // 예: axios를 사용한 API 요청
-      axios.get(`/api/getTasksForProject?projectNum=${projectNum}`)
-        .then(response => {
-          this.tasks.data = response.data.tasks || [];
-          this.tasks.links = response.data.links || [];
-        })
-        .catch(error => {
-          console.error("Error fetching tasks:", error);
-        });
+    async renderGanttChart(selectedProject) {
+      gantt.clearAll();
+      try {
+        const payload = {
+          t_key: this.key,
+          project_num: selectedProject.project_num
+        };
+        const response = await axios.post("http://localhost:8030/api/getAllTodoList", payload);
+  
+        const transformedTasks = response.data.map(task => ({
+          id: task.todo_num,
+          text: task.todo_title,
+          start_date: this.$store.getters.formatDate(task.start_date),
+          end_date: this.$store.getters.formatDate(task.due_date),
+          member: task.member_name,
+          status: task.status,
+          content: task.content,
+          project_manager : this.selectedProject.project_manager
+        }));
+        this.tasks = { data: transformedTasks };
+        gantt.parse(this.tasks);
+      } catch (error) {
+        console.error("Gantt chart data fetch failed", error);
+      }
     }
   },
     

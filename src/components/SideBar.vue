@@ -5,7 +5,7 @@
           <span> 〉&nbsp;전체 프로젝트&nbsp;</span>
             <img src="../assets/icon/add_btn.png" @click="openModal">
             <CreateProjectModal :visible="showModal" @close="closeModal" @projectCreated="handleProjectCreated"
-            ></CreateProjectModal>
+            :projectData="selectedProject"></CreateProjectModal>
         </div>
           <div>
             <div class="project-list">
@@ -31,6 +31,7 @@
 import CreateProjectModal from "./CreateProjectModal.vue";
 import axios from "axios";
 import mixin from "../mixin";
+import { mapState } from "vuex";
 
 export default {
   name: 'SideBar',
@@ -39,7 +40,6 @@ export default {
   inject: ["eventBus"],
   data() {
     return {
-      projectList: [],
       projectNum: null,
       showModal: false,
       showProjects: false,
@@ -48,6 +48,12 @@ export default {
   },
   mounted(){
     this.getProjectList();
+  },
+  computed:{
+    ...mapState(['projectList', 'selectedProject']),
+    projects() {
+    return this.projectList;
+  }
   },
   methods: {
     toggleProjects() {
@@ -60,7 +66,7 @@ export default {
       this.showModal = true;
     },
     handleProjectCreated(newProject) {
-    this.projectList.push(newProject);
+      this.$store.dispatch('updateProjectsData', [...this.projectList, newProject]);
     },
     toggleProjectStyle(index) {
       //현재 활성화된 프로젝트의 인덱스를 업데이트
@@ -73,8 +79,9 @@ export default {
     async getProjectList(){
       try {
         const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-        this.projectList = response.data;
-        console.log("Get Projcet List >>>>>>>>", this.projectList)
+        this.projects = response.data;
+        this.$store.dispatch('updateProjectsData', response.data);
+        console.log("Get Projcet List >>>>>>>>", this.projects)
       } catch (error) {
         console.log("Failed to Get Project List >>>>", error);
       }
@@ -83,6 +90,7 @@ export default {
       if (!this.projectNum || this.projectNum !== project.project_num) {
         this.eventBus.emit('getTodoList', project);
         this.projectNum = project.project_num
+        this.$store.commit('setSelectedProject', project);
       }
     }
   }

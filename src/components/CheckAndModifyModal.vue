@@ -221,10 +221,9 @@
       this.localProject.due_date = this.due_date;
       this.localProject.status = this.selectedStatus;
       this.localProject.selectedMembers = this.selectedMembers;
-      
 
-      //this.$store.dispatch('updateSelectedProject', response.data);
-      //this.$store.commit('updateProjectInList', response.data);
+      this.$store.dispatch('updateSelectedProject', response.data);
+      this.$store.commit('updateProjectInList', response.data);
       this.isEditMode = false;
       this.$emit('close');
     } catch (error) {
