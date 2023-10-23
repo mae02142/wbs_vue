@@ -4,8 +4,8 @@
         <div class="create-project">
           <span> 〉&nbsp;전체 프로젝트&nbsp;</span>
             <img src="../assets/icon/add_btn.png" @click="openModal">
-            <CreateProjectModal :visible="showModal" @close="closeModal" @confirm="addTask" @projectCreated="handleProjectCreated"
-            :projectData="selectedProject"></CreateProjectModal>
+            <CreateProjectModal :visible="showModal" @close="closeModal" @projectCreated="handleProjectCreated"
+            ></CreateProjectModal>
         </div>
           <div>
             <div class="project-list">
@@ -15,7 +15,7 @@
             </div>
             <div>
               <ul v-if="showProjects">                                                                                                   
-                <li v-for="(project, index) in projects" :key="project.project_num">
+                <li v-for="(project, index) in projectList" :key="project.project_num">
                 <span class="project-title" @click="selectProject(project), toggleProjectStyle(index)"
                 :class="{ 'active': activeProjectIndex === index }">
                 {{ project.project_title }}</span>
@@ -44,7 +44,6 @@ export default {
       showModal: false,
       showProjects: false,
       activeProjectIndex: -1,
-      member_num:''
     };
   },
   mounted(){
@@ -61,8 +60,7 @@ export default {
       this.showModal = true;
     },
     handleProjectCreated(newProject) {
-    this.projects.push(newProject);
-    this.member_num = newProject.member_num;
+    this.projectList.push(newProject);
     },
     toggleProjectStyle(index) {
       //현재 활성화된 프로젝트의 인덱스를 업데이트

@@ -84,10 +84,12 @@
   import MemberSearchModal from "./MemberSearchModal.vue";
   import axios from "axios";
   import mixin from "../mixin";
+  
 
   export default {
     name:"CheckAndModifyModal",
     mixins:[mixin],
+    inject: ["eventBus"],
     components:{MemberSearchModal},
     props: {
     visible: {
@@ -218,10 +220,11 @@
       this.localProject.start_date = this.start_date;
       this.localProject.due_date = this.due_date;
       this.localProject.status = this.selectedStatus;
-      this.localProject.selectedMembers = this.selectedMembers; // 만약 필요하다면 이 부분도 추가하세요.
+      this.localProject.selectedMembers = this.selectedMembers;
       
-      this.$store.dispatch('updateSelectedProject', response.data);
-      this.$store.commit('updateProjectInList', response.data);
+
+      //this.$store.dispatch('updateSelectedProject', response.data);
+      //this.$store.commit('updateProjectInList', response.data);
       this.isEditMode = false;
       this.$emit('close');
     } catch (error) {

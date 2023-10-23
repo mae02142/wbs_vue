@@ -9,6 +9,12 @@ import mixin from "../mixin";
 export default {
   name: "GanttConfig",
   mixins: [mixin],
+  data() {
+    return {
+      selectedScale: "day",
+      updatingTask: false,  // 중복 업데이트 방지 플래그
+    };
+  },
   props: {
     tasks: {
       type: Object,

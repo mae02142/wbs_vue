@@ -111,11 +111,6 @@
       this.hasSelectedMembers = this.selectedMembers.length > 0;
       console.log("selectedMembers",this.selectedMembers);
   },
-      forTest(temp){
-      console.log("key : " + temp);
-      this.key = temp;
-      this.searchPM();
-    },
 
       close() {
         this.setClearData();

@@ -2,15 +2,18 @@
   <div class="tl-container">
     <SideBar @projectSelected="handleProjectSelected"></SideBar>
     <div class="tab">
-      <button @click="toggleView()">Time Line</button>
-      <button @click="toggleView()">Calendar</button>
-      <GanttContainer v-if="isTimeLine"
-        :todoList="todoTimeLine">
-      </GanttContainer>
-      <FullCalendar v-if="isCalendar"
-        :todoList="todoCalendar">
-      </FullCalendar>
+      <button @click="viewTimeline()">Time Line</button>
+      <button @click="viewCalendar()">Calendar</button>
+      <span @click="openProjectSettingModal">상세보기</span>
+        <CheckAndModifyModal :project="selectedProject" :visible="showProjectSettingModal"
+        @close="closeProjectSettingModal"></CheckAndModifyModal>
     </div>
+    <GanttContainer v-if="isTimeLine"
+      :todoList="todoTimeLine" :project="selectedProject">
+    </GanttContainer>
+    <FullCalendar v-if="isCalendar"
+      :todoList="todoCalendar">
+    </FullCalendar>
   </div>
 </template>
 
@@ -18,20 +21,22 @@
 import SideBar from './components/SideBar';
 import GanttContainer from "./components/GanttContainer.vue";
 import FullCalendar from "./components/FullCalendar.vue";
+import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
 
+
 export default {
-  components: { SideBar, GanttContainer, FullCalendar},
+  components: { SideBar, GanttContainer, FullCalendar, CheckAndModifyModal},
   inject: ["eventBus"],
   mixins:[mixin],
   data() {
     return {
       todoList: [],
-      todoCalendar: [],
-      todoTimeLine: [],
       isTimeLine: true,
       isCalendar: false,
+      showProjectSettingModal:false,
+      selectedProject:{}
     };
   },
   mounted() {
@@ -44,55 +49,41 @@ export default {
   },
   methods: {
     getTodoList(project) {
-      this.initializeArray();
+      this.selectedProject=project;
       axios.post("http://localhost:8030/api/getAllTodoList", {
         project_num: project.project_num,
         t_key: this.key
       })
       .then(response => {
         this.todoList = response.data;
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         console.log("Get Todo data >>>>", this.todoList);
-        this.todoListforCal();
+        this.eventBus.emit('todoCalendar',this.todoList); // todoCalendar라는 event 발생 시 todoList 전달
+        //!!!
       })
       .catch (error => {
         console.log("Failed to Get Todo List >>>>", error);
       })
-    }, // getTodoList()
-    initializeArray() {
-      this.todoList = []
-      console.log("initializeArray >>", this.todoList)
-    },
-    todoListforCal() {
-      console.log('todoListforCal >>>');
-      var dataList = this.todoList;
-      this.todoCalendar = [];
-      dataList.map((element) => {
-        const startDate = new Date(element.start_date);
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(element.due_date);
-        endDate.setHours(0, 0, 0, 0);
-        startDate.setDate(startDate.getDate() + 1);
-        endDate.setDate(endDate.getDate() + 1);
 
-        this.todoCalendar.push({
-          id: element.todo_num,
-          title: element.todo_title,
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-          member_name: element.member_name,
-          content: element.content,
-          member_num: element.member_num 
-        })
-      })
       this.eventBus.emit('resetCalendar',this.todoCalendar);
     },
-    todoListforTL() {
-
+    viewTimeline() {
+      if (!this.isTimeLine) {
+        this.isTimeLine = !this.isTimeLine;
+        this.isCalendar = false;
+      }
+      
     },
-    toggleView() { // toggle for category
-      this.isTimeLine = !this.isTimeLine;
-      this.isCalendar = !this.isCalendar;
+    viewCalendar() {
+      if (!this.isCalendar) {
+        this.isCalendar = !this.isCalendar;
+        this.isTimeLine = false;
+      }
+    },
+    openProjectSettingModal(){
+    this.showProjectSettingModal=true;
+    },
+    closeProjectSettingModal(){
+      this.showProjectSettingModal=false;
     }
   }
 }

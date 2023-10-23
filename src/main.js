@@ -5,7 +5,6 @@ import store from './store/index';
 import axios from 'axios'
 import ganttastic from '@infectoone/vue-ganttastic'
 import mitt from 'mitt';
-
 const eventBus = mitt();
 
 const apiClient = axios.create({

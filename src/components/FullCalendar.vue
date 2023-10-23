@@ -18,11 +18,9 @@ export default {
     todoList: [],
   },
   data () {
-    return {      
-      // todoList: [], // db - todo list
-      //localTodoList: {...this.todoList},
+    return {
+      todoListforCal: this.todoList,
       showModal: false,
-      isShow: true,
       calendarOptions: {
         plugins: [
           dayGridPlugin,
@@ -49,14 +47,13 @@ export default {
     }
   },
   mounted() {
-    document.test = this.$refs.cal;
-    this.eventBus.on('resetCalendar',this.test);
+    // App.vue에서 eventBus -> todoCalendar 라는 event 발생할 경우
+    // this.resetCalendar 실행 -> todos = 전달 받은 App.vue의 todoList
+    this.eventBus.on('todoCalendar',this.resetCalendar);
   },
   methods: {
     setTodoList() {
       console.log('Calendar Todo >>>>>>>', this.todoList)
-      // this.calendarOptions.events = [];
-      // this.calendarOptions.events = this.todoList;
     },
 
     handleDateSelect(selectInfo) {
@@ -86,10 +83,32 @@ export default {
     openModal() {
       this.showModal = true;
     },
-    test(value){
+    resetCalendar(todos){
+      var dataList = todos;
+      console.log("todos >>>>>", todos)
+      this.todoListforCal = []; // project 바뀔 때마다 todoList 초기화
+      dataList.map((element) => {
+        const startDate = new Date(element.start_date);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(element.due_date);
+        endDate.setHours(0, 0, 0, 0);
+        startDate.setDate(startDate.getDate() + 1);
+        endDate.setDate(endDate.getDate() + 1);
+
+        this.todoListforCal.push({
+          id: element.todo_num,
+          title: element.todo_title,
+          start: startDate.toISOString().split('T')[0],
+          end: endDate.toISOString().split('T')[0],
+          member_name: element.member_name,
+          content: element.content,
+          member_num: element.member_num 
+        })
+      })
+
       this.$refs.cal.getApi().pauseRendering();
       this.$refs.cal.getApi().destroy();
-      this.calendarOptions.events = value;
+      this.calendarOptions.events = this.todoListforCal;
       this.$refs.cal.buildOptions(this.calendarOptions);
       this.$refs.cal.getApi().render();
     }
@@ -100,10 +119,7 @@ export default {
 <template>
   <div class='app'>
     <div class='app-main'>
-      <button @click="test">test</button>
-      <FullCalendar
-        v-if="isShow"
-        class='app-calendar'
+      <FullCalendar class='app-calendar'
         :options='calendarOptions'
         ref="cal"
       >
