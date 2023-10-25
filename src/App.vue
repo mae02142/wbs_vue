@@ -1,6 +1,6 @@
 <template>
   <div class="tl-container">
-    <SideBar @projectSelected="handleProjectSelected"></SideBar>
+    <SideBar @projectSelected="getTodoList"></SideBar>
     <div class="tab">
       <button class="tab-btn1" @click="viewTimeline()">Time Line</button>
       <button class="tab-btn2" @click="viewCalendar()">Calendar</button>
@@ -8,27 +8,28 @@
         <CheckAndModifyModal :project="selectedProject" :visible="showProjectSettingModal"
         @close="closeProjectSettingModal"></CheckAndModifyModal>
     </div>
-    <GanttContainer v-if="isTimeLine"
-      :todoList="todoTimeLine" :project="selectedProject">
-    </GanttContainer>
-    <FullCalendar v-if="isCalendar"
-      :todoList="todoCalendar">
-    </FullCalendar>
+    <div>
+      <GanttConfig v-if="isTimeLine && selectedProject" :project="selectedProject" :todoList="todoList"
+      @task-changed="getTodoList(selectedProject)">
+      </GanttConfig>
+      <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
+      </FullCalendar>
+    </div>
   </div>
 </template>
 
 <script>
 import SideBar from './components/SideBar';
-import GanttContainer from "./components/GanttContainer.vue";
+import GanttConfig from "./components/GanttConfig.vue";
 import FullCalendar from "./components/FullCalendar.vue";
 import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
+import { mapState } from "vuex";
 
 
 export default {
-  components: { SideBar, GanttContainer, FullCalendar, CheckAndModifyModal},
-  inject: ["eventBus"],
+  components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal},
   mixins:[mixin],
   data() {
     return {
@@ -36,53 +37,54 @@ export default {
       isTimeLine: true,
       isCalendar: false,
       showProjectSettingModal:false,
-      // selectedProject:{}
     };
   },
-  mounted() {
-    this.eventBus.on('getTodoList',(project)=>{
-      this.getTodoList(project);
-    })
-  },
-  beforeUnmount() {
-    this.eventBus.off('getTodoList');
-  },
   computed: {
-  selectedProject() {
-    return this.$store.state.selectedProject;
+    ...mapState(['selectedProject']),
+  },
+  watch: {
+    selectedProject: {
+      async handler(newProject) {
+        if (newProject && newProject.project_num) {
+          await this.getTodoList(newProject);
+        }
+      },
+      deep: true,
+      immediate: true,
     }
   },
   methods: {
-    getTodoList(project) {
-      axios.post("http://localhost:8030/api/getAllTodoList", {
-        project_num: project.project_num,
-        t_key: this.key
-      })
-      .then(response => {
+    async getTodoList(project) {
+      try {
+        const response = await axios.post("http://localhost:8030/api/getAllTodoList", 
+        {
+          project_num:project.project_num,
+          t_key: this.key,
+        });
         this.todoList = response.data;
-        console.log("Get Todo data >>>>", this.todoList);
-        this.eventBus.emit('todoCalendar',this.todoList); // todoCalendar라는 event 발생 시 todoList 전달
-        //!!!
-      })
-      .catch (error => {
-        console.log("Failed to Get Todo List >>>>", error);
-      })
+        console.log("캘린더로 보낼!!", this.todoList);
+      } catch (error) {
+        console.error("Failed to Get Todo List", error);
+      }
+    },
 
-      this.eventBus.emit('resetCalendar',this.todoCalendar);
-    },
     viewTimeline() {
-      if (!this.isTimeLine) {
-        this.isTimeLine = !this.isTimeLine;
-        this.isCalendar = false;
-      }
-      
-    },
-    viewCalendar() {
-      if (!this.isCalendar) {
-        this.isCalendar = !this.isCalendar;
-        this.isTimeLine = false;
-      }
-    },
+    if (this.selectedProject && this.selectedProject.project_num) {
+      this.isTimeLine = true;
+      this.isCalendar = false;
+    } else {
+      alert('먼저 프로젝트를 선택해주세요.');
+    }
+  },
+  
+  viewCalendar() {
+    if (this.selectedProject && this.selectedProject.project_num) {
+      this.isCalendar = true;
+      this.isTimeLine = false;
+    } else {
+      alert('먼저 프로젝트를 선택해주세요.');
+    }
+  },
     openProjectSettingModal(){
     this.showProjectSettingModal=true;
     },

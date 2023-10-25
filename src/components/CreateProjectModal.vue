@@ -78,10 +78,10 @@
         type: Boolean,
         default: false
       },
-      daysInMonth: {
-        type: Number,
-        required: true
-      }
+      // daysInMonth: {
+      //   type: Number,
+      //   required: true
+      // }
     },
     data() {
       return {

@@ -4,22 +4,21 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
-import CreateProjectModal from "./CreateProjectModal.vue";
 import mixin from "../mixin";
 
 export default {
   mixins:[mixin],
   components: {
-    FullCalendar,
-    CreateProjectModal,
+    FullCalendar
   },
-  inject: ["eventBus"],
   props: {
-    todoList: [],
+    project: Object,
+    todoList: Array
   },
   data () {
     return {
-      todoListforCal: this.todoList,
+      todoListforCal: [],
+      // todoListforCal: this.todoList,
       showModal: false,
       calendarOptions: {
         plugins: [
@@ -46,15 +45,17 @@ export default {
       },
     }
   },
-  mounted() {
-    // App.vue에서 eventBus -> todoCalendar 라는 event 발생할 경우
-    // this.resetCalendar 실행 -> todos = 전달 받은 App.vue의 todoList
-    this.eventBus.on('todoCalendar',this.resetCalendar);
+  watch: {
+    todoList: {
+      handler(newTodoList) {
+        if (newTodoList) {
+          this.resetCalendar(newTodoList);
+        }
+      },
+      immediate: true
+    }
   },
   methods: {
-    setTodoList() {
-      console.log('Calendar Todo >>>>>>>', this.todoList)
-    },
 
     handleDateSelect(selectInfo) {
       let title = prompt('일정 제목을 입력하세요')
@@ -83,36 +84,34 @@ export default {
     openModal() {
       this.showModal = true;
     },
-    resetCalendar(todos){
-      var dataList = todos;
-      console.log("todos >>>>>", todos)
-      this.todoListforCal = []; // project 바뀔 때마다 todoList 초기화
-      dataList.map((element) => {
-        const startDate = new Date(element.start_date);
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(element.due_date);
-        endDate.setHours(0, 0, 0, 0);
-        startDate.setDate(startDate.getDate() + 1);
-        endDate.setDate(endDate.getDate() + 1);
+    async resetCalendar(todos) {
+      console.log("리셋캘린더의 투두",todos);
+     this.todoListforCal = todos.map((element) => {
+    const startDate = new Date(element.start_date);
+    startDate.setHours(0, 0, 0, 0);
+    startDate.setDate(startDate.getDate() + 1);
 
-        this.todoListforCal.push({
-          id: element.todo_num,
-          title: element.todo_title,
-          start: startDate.toISOString().split('T')[0],
-          end: endDate.toISOString().split('T')[0],
-          member_name: element.member_name,
-          content: element.content,
-          member_num: element.member_num 
-        })
-      })
+    const endDate = new Date(element.due_date);
+    endDate.setHours(0, 0, 0, 0);
+    endDate.setDate(endDate.getDate() + 1);
 
-      this.$refs.cal.getApi().pauseRendering();
-      this.$refs.cal.getApi().destroy();
-      this.calendarOptions.events = this.todoListforCal;
-      this.$refs.cal.buildOptions(this.calendarOptions);
-      this.$refs.cal.getApi().render();
-    }
-  },
+    return {
+      id: element.todo_num,
+      title: element.todo_title,
+      start: startDate.toISOString().split('T')[0],
+      end: endDate.toISOString().split('T')[0],
+      member_name: element.member_name,
+      content: element.content,
+      member_num: element.member_num 
+    };
+  });
+
+  await this.$nextTick();
+  const calendarApi = this.$refs.cal.getApi();
+  calendarApi.removeAllEvents();
+  this.todoListforCal.forEach(event => calendarApi.addEvent(event));
+}
+}
 }
 </script>
 
@@ -128,11 +127,6 @@ export default {
           <span>{{ arg.event.title }}</span>
         </template>
       </FullCalendar>
-
-      <CreateProjectModal :visible="showModal" 
-      @close="closeModal" @confirm="addTask" 
-      @projectCreated="handleProjectCreated"
-      :projectData="selectedProject"></CreateProjectModal>
     </div> 
   </div>
 </template>
