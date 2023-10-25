@@ -15,7 +15,7 @@ b { /* used for event dates/times */
 /* Calendar */
 .app-main {
   flex-grow: 1;
-  padding: 9em 3em;
+  padding: 4em 18em;
 }
 
 .fc { /* the calendar root */

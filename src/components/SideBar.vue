@@ -2,16 +2,16 @@
   <aside>
     <nav id="sideBar">
         <div class="create-project">
-          <span> 〉&nbsp;전체 프로젝트&nbsp;</span>
-            <img src="../assets/icon/add_btn.png" @click="openModal">
+          <span><img src="../assets/icon/icon-row.png" style="width:12px; height:12px;">&nbsp;&nbsp;전체 프로젝트&nbsp;</span>
+            <img class="project-img" src="../assets/icon/icon-plus.png" @click="openModal">
             <CreateProjectModal :visible="showModal" @close="closeModal" @projectCreated="handleProjectCreated"
             :projectData="selectedProject"></CreateProjectModal>
         </div>
           <div>
             <div class="project-list">
-              <span> 〉&nbsp;목록 보기&nbsp;</span>
-              <img v-if="!showProjects" @click="toggleProjects" src="../assets/icon/down.png">
-              <img v-else @click="toggleProjects" src="../assets/icon/up.png">
+              <span><img src="../assets/icon/icon-row.png" style="width:12px; height:12px;">&nbsp;&nbsp;목록 보기&nbsp;</span>
+              <img v-if="!showProjects" @click="toggleProjects" class="down-img" src="../assets/icon/icon-down.png">
+              <img v-else @click="toggleProjects" class="down-img" src="../assets/icon/icon-up.png">
             </div>
             <div>
               <ul v-if="showProjects">                                                                                                   

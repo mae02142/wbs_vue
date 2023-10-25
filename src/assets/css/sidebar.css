@@ -1,26 +1,26 @@
 #sideBar {
     float: left;
-    padding: 50px 0px 0px 30px;
+    padding: 60px 0px 0px 25px;
     width: 130px;
     height: calc(100vh);
     margin-top: -65px;
-    width: 200px;
+    width: 180px;
     line-height: 1.5;
-    background: #09550914;
+    background: #d6ddd630;
     border-right: 2px solid #09550914;
-    border-radius: 0px 20px 20px 0px;
+    border-radius: 0px 25px 25px 0px;
 }
 
 #sideBar ul {
     list-style: none;
-    padding: 11px 15px 15px 15px;
+    padding: 6px 0px 8px 20px;
 }
 
 #sideBar ul li {
-    margin-bottom: 18px;
-    letter-spacing: 1px;
-    font-size: 14px;
-    color: #635f5f;
+    margin-bottom: 10px !important;
+    letter-spacing: -1px;
+    font-size: 12px;
+    color: #635f5fc2;
 }
 #sideBar a {
     font-style: normal;  /* 'none' 대신 'normal'을 사용해야 합니다. */
@@ -30,21 +30,28 @@
 
 .create-project{
     display: flex;
-    gap: 5px;
-    font-size: 14px;
+    gap: 3px;
+    font-size: 13px !important;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    color: #193616eb;
 }
 
 .project-list{
-    margin-top: 20px;
+    margin-top: 13px;
     display: flex;
-    gap: 5px;
-    font-size: 14px;
+    gap: 8px;
+    font-size: 13px !important;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    color: #193616eb;
 }
-.project-list img, .create-project img{
+.project-img{
+    width: 31px;
+    height: 30px;
+    cursor: pointer;
+}
+.down-img {
     width: 20px;
     height: 20px;
     cursor: pointer;
@@ -52,10 +59,12 @@
 
 .project-title.active {
     font-weight: 600;
-    color: #3d6032b5;
+    color: #3d60328f;
     background-color: rgb(167 199 167 / 14%);
     border-radius: 20px;
-    padding: 5px 23px 5px 23px;
+    padding: 3px 10px 3px 10px;
+    font-size: 12px;
     border: 1px solid rgb(0 128 0 / 0%);
+    letter-spacing: 0px;
 }
 

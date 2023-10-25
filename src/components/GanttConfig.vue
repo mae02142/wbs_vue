@@ -1,58 +1,58 @@
 <template>
   <div>
+      <div class="custom-radio">
+          <input
+            type="radio"
+            id="scale1"
+            class="gantt_radio"
+            name="scale"
+            value="day"
+            v-model="selectedScale"
+          />
+          <label for="scale1">일별</label>
 
-    <div class="custom-radio">
-            <input
-              type="radio"
-              id="scale1"
-              class="gantt_radio"
-              name="scale"
-              value="day"
-              v-model="selectedScale"
-            />
-            <label for="scale1">일별</label>
-  
-            <input
-              type="radio"
-              id="scale2"
-              class="gantt_radio"
-              name="scale"
-              value="week"
-              v-model="selectedScale"
-            />
-            <label for="scale2">주별</label>
-  
-            <input
-              type="radio"
-              id="scale3"
-              class="gantt_radio"
-              name="scale"
-              value="month"
-              v-model="selectedScale"
-            />
-            <label for="scale3">달별</label>
-  
-            <input
-              type="radio"
-              id="scale4"
-              class="gantt_radio"
-              name="scale"
-              value="quarter"
-              v-model="selectedScale"
-            />
-            <label for="scale4">분기별</label>
-  
-            <input
-              type="radio"
-              id="scale5"
-              class="gantt_radio"
-              name="scale"
-              value="year"
-              v-model="selectedScale"
-            />
-            <label for="scale5">연도별</label>
-        </div>
-    <div ref="gantt" class="gantt-c"></div>
+          <input
+            type="radio"
+            id="scale2"
+            class="gantt_radio"
+            name="scale"
+            value="week"
+            v-model="selectedScale"
+          />
+          <label for="scale2">주별</label>
+
+          <input
+            type="radio"
+            id="scale3"
+            class="gantt_radio"
+            name="scale"
+            value="month"
+            v-model="selectedScale"
+          />
+          <label for="scale3">달별</label>
+
+          <input
+            type="radio"
+            id="scale4"
+            class="gantt_radio"
+            name="scale"
+            value="quarter"
+            v-model="selectedScale"
+          />
+          <label for="scale4">분기별</label>
+
+          <input
+            type="radio"
+            id="scale5"
+            class="gantt_radio"
+            name="scale"
+            value="year"
+            v-model="selectedScale"
+          />
+          <label for="scale5">연도별</label>
+      </div>
+
+      <div ref="gantt" class="gantt-c"></div>
   </div>
 </template>
 
@@ -79,11 +79,6 @@ export default {
       updatingTask: false,  // 중복 업데이트 방지 플래그
     };
   },
-  computed: {
-    loginMember() {
-      return this.$store.state.loginMember;
-    }
-  },
   watch: {
     selectedScale(newValue) {
       switch (newValue) {
@@ -105,8 +100,13 @@ export default {
       }
     },
   },
-    methods: {
-      //selectedScale
+  computed: {
+    loginMember() {
+      return this.$store.state.loginMember;
+    }
+  },
+  methods: {
+    //selectedScale
     setDayScale() {
       gantt.config.scale_unit = "day";
       gantt.config.date_scale = "%d %M";
@@ -133,60 +133,58 @@ export default {
       gantt.config.subscales = [{ unit: "month", step: 1, date: "%M" }];
       gantt.render();
     },
-
     setYearScale() {
       gantt.config.scale_unit = "year";
       gantt.config.date_scale = "%Y";
       gantt.render();
     },
-      //todo 저장
-      async saveTaskToServer(task) {
-        try {
-          const response = await axios.post(
-            "http://localhost:8030/api/createTodo",
-            {
-              t_key: this.key,
-              project_num:this.$store.state.selectedProject.project_num,
-              todoDTO: task,
-            }
-          );
-          console.log("saveTaskToServer>>",response.data);
-          this.data=response.data;
+    //todo 저장
+    async saveTaskToServer(task) {
+      try {
+        const response = await axios.post(
+          "http://localhost:8030/api/createTodo",
+          {
+            t_key: this.key,
+            project_num:this.$store.state.selectedProject.project_num,
+            todoDTO: task,
+          }
+        );
+        console.log("saveTaskToServer>>",response.data);
+        this.data=response.data;
 
-        } catch (error) {
-          console.log(error);
-        }
-      },
-      //todo 수정
-      async updateTaskOnServer(task) {
-        try {
-          const response = await axios.put("http://localhost:8030/api/updateTodo",
-            {
-              t_key: this.key,
-              todoDTO: task
-            });
-          console.log("updateTaskOnServer", response.data);
-        } catch (error) {
-          console.error("Failed to update task on server", error);
-        }finally{
-          this.updatingTask = false;  // 작업 업데이트가 완료된 후 플래그를 재설정
-        }
-      },
-      //todo 삭제
-      async deleteTaskonServer(task) {
-        try {
-          const response = await axios.delete("http://localhost:8030/api/deleteTodo",
-            {
-              t_key: this.key,
-              todoDTO: task
-            });
-            console.log("delete>>>",response.data);
-        } catch (error) {
-          console.error("Failed to delete task on server", error);
-        }
+      } catch (error) {
+        console.log(error);
       }
     },
-
+    //todo 수정
+    async updateTaskOnServer(task) {
+      try {
+        const response = await axios.put("http://localhost:8030/api/updateTodo",
+          {
+            t_key: this.key,
+            todoDTO: task
+          });
+        console.log("updateTaskOnServer", response.data);
+      } catch (error) {
+        console.error("Failed to update task on server", error);
+      }finally{
+        this.updatingTask = false;  // 작업 업데이트가 완료된 후 플래그를 재설정
+      }
+    },
+    //todo 삭제
+    async deleteTaskonServer(task) {
+      try {
+        const response = await axios.delete("http://localhost:8030/api/deleteTodo",
+          {
+            t_key: this.key,
+            todoDTO: task
+          });
+          console.log("delete>>>",response.data);
+      } catch (error) {
+        console.error("Failed to delete task on server", error);
+      }
+    }
+  },
     mounted: function () {
       gantt.config.date_format = "%Y-%m-%d";
       gantt.config.columns = [
@@ -197,6 +195,9 @@ export default {
         { name: "add", label: "" },
       ];
       gantt.config.grid_width = 450;
+      
+      //주 단위로 보기
+      gantt.config.scale_unit = "week";
       gantt.config.scrollable = true;
       gantt.config.scale_unit = "day";
       gantt.config.show_links = false;
@@ -304,6 +305,7 @@ export default {
 
 <style>
 @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css";
+
 .gantt-c {
   width: 100%;
   height: 800px;
@@ -348,10 +350,6 @@ export default {
 /* /////////////////////////////////////////// end radio */
 
 
-.gantt-c {
-  min-height: 600px;
-}
-
 .gantt_row.odd{ /* 짝수 행마다 회색*/
     background-color:#f4f4fb4b;
 }
@@ -386,6 +384,41 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     font-size: 13px;
+}
+.gantt_tree_icon.gantt_blank {
+    width: 10px;
+}
+
+.gantt_grid_head_text[data-column-name="text"] {
+    width: 160px !important;
+}
+.gantt_cell_tree[data-column-name="text"] { /* title cell */
+    width: 180px !important;
+    margin-left: -10px !important;
+}
+
+.gantt_last_cell[data-column-id="add"]{
+    width: 25px!important;
+}
+
+.gantt_grid_head_member[data-column-id="member"]{
+    width: 90px;
+    /* margin-left: 30px; */
+}
+.gantt_cell[data-column-name="member"] {
+    width: 70px !important;
+    text-align: center;
+    justify-content: center;
+}
+
+.gantt_grid_head_end_date[data-column-id="end_date"]{
+    width: 95px !important;
+    margin-left: 3PX;
+} 
+
+
+div.gantt_add[role="button"] { /* 작은 셀에 + 버튼 없애기 */
+    display: none;
 }
 
 .gantt_add, .gantt_grid_head_add { /* plus 이미지 버튼 */
@@ -521,7 +554,10 @@ span.gantt_title {
     color: #726666;
     outline: none!important;
     resize: none;
-    padding: 6px 0px 6px 15px;
+    padding: 6px 0px 6px 15px;  
+}
+.gantt_cal_ltext textarea::placeholder {
+  color: transparent; /* 글씨 색상을 투명하게 만듭니다. */
 }
 .gantt_cal_ltext {
     padding: 8px 21px;
@@ -610,6 +646,7 @@ div[role="button"][aria-label="저장"] {
 
 .gantt_btn_set[role="button"][aria-label="삭제"] {
     float: inline-start !important;
+    /* display: none; */
 }
 /*///////////////////////// end +modal */ 
 
