@@ -69,7 +69,10 @@
                     @update-selected-members="updateSelectedMembers" :sendMemberName="selectedMembers">
                     </MemberSearchModal>
                     <div class="create-btn"> 
-                      <button v-if="!isEditMode&&this.loginMember.member_num==this.project.member_num" @click="enterEditMode">수정</button>
+                      <div v-if="!isEditMode&&this.loginMember.member_num==this.project.member_num">
+                        <button  @click="enterEditMode">수정</button>
+                        <button  @click="confirmDeletion">삭제</button>
+                      </div>
                       <div v-else-if="isEditMode&&this.loginMember.member_num==this.project.member_num">
                         <button @click="saveChanges">확인</button>
                         <button class="cancel-btn" @click="close">취소</button>
@@ -89,7 +92,6 @@
   export default {
     name:"CheckAndModifyModal",
     mixins:[mixin],
-    inject: ["eventBus"],
     components:{MemberSearchModal},
     props: {
     visible: {
@@ -229,9 +231,25 @@
     } catch (error) {
       console.log(error);
     }
-    }
-  }
-
+    },
+    confirmDeletion() {
+      if (confirm("정말 삭제하시겠습니까?")) {
+        this.deleteProject();
+      }
+    },
+    async deleteProject() {
+      try {
+        const response = await axios.post("http://localhost:8030/api/deleteProject",{
+        t_key: this.key,
+        project_num:this.project.project_num 
+      });
+        this.$store.commit('deleteProject', response.data);
+        this.$emit('close');
+      } catch (error) {
+        console.error('프로젝트 삭제 실패:', error);
+      }
+    },
+  },
   }
   
   </script>

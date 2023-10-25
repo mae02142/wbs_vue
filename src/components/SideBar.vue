@@ -16,8 +16,7 @@
             <div>
               <ul v-if="showProjects">                                                                                                   
                 <li v-for="(project, index) in projectList" :key="project.project_num">
-                <span class="project-title" @click="selectProject(project), toggleProjectStyle(index)"
-                :class="{ 'active': activeProjectIndex === index }">
+                <span class="project-title" @click="selectProject(project, index)" :class="{ 'active': activeProjectIndex === index }">
                 {{ project.project_title }}</span>
               </li>
               </ul>
@@ -37,7 +36,6 @@ export default {
   name: 'SideBar',
   mixins:[mixin],
   components:{CreateProjectModal},
-  inject: ["eventBus"],
   data() {
     return {
       projectNum: null,
@@ -51,9 +49,6 @@ export default {
   },
   computed:{
     ...mapState(['projectList', 'selectedProject']),
-    projects() {
-    return this.projectList;
-  }
   },
   methods: {
     toggleProjects() {
@@ -79,20 +74,21 @@ export default {
     async getProjectList(){
       try {
         const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-        this.projects = response.data;
         this.$store.dispatch('updateProjectsData', response.data);
-        console.log("Get Projcet List >>>>>>>>", this.projects)
       } catch (error) {
         console.log("Failed to Get Project List >>>>", error);
       }
     },
-    selectProject(project) {
-      if (!this.projectNum || this.projectNum !== project.project_num) {
-        this.eventBus.emit('getTodoList', project);
-        this.projectNum = project.project_num
-        this.$store.commit('setSelectedProject', project);
-      }
+    selectProject(project, index) {
+    if (this.selectedProject.project_num !== project.project_num) {
+      this.$store.commit('setSelectedProject', project);
     }
+    this.updateActiveProjectIndex(index);
+  },
+  
+  updateActiveProjectIndex(index) {
+    this.activeProjectIndex = this.activeProjectIndex === index ? -1 : index;
+  },
   }
 }
 </script>

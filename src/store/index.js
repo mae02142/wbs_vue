@@ -51,6 +51,9 @@ export default createStore({
       if (index !== -1) {
         state.projectList.splice(index, 1, updatedProject);
       }
+    },
+    deleteProject(state, project_num) {
+      state.projectList = state.projectList.filter(p => p.project_num !== project_num);
     }
   },
   actions: {

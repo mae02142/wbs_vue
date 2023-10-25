@@ -3,7 +3,7 @@
 export default {
     data() {
       return {
-        key: '2d434819-953d-4edb-b7ff-5f8f91e4164b',
+        key: '3fa8ba15-0b3c-4c9e-acce-f0f4fc6c0cca',
       };
     },
     mounted() {
@@ -11,7 +11,6 @@ export default {
     },
     methods: {
       checkInput() {
-        //console.log('checkInput');
         if(document.getElementsByName('tKey').length > 0  && document.getElementsByName('tKey')[0].value){
           console.log(document.getElementsByName('tKey')[0].value);
           this.getTodo(document.getElementsByName('tKey')[0].value);

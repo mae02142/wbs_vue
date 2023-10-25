@@ -9,50 +9,43 @@
 </template>
 
 <script>
-import GanttConfig from './GanttConfig.vue';
-import axios from 'axios';
+import GanttConfig from '../components/GanttConfig.vue';
 import mixin from "../mixin";
-import { mapGetters } from 'vuex';
 import { gantt } from "dhtmlx-gantt";
-
+7
 export default {
   name: 'GanttContainer',
   components: {GanttConfig},
   mixins:[mixin],
   props: {
     project: Object,
+    todoList: Array,
   },
   data () {
     return {
       tasks: {
         data: []
       },
-      messages: []
     }
   },
-  computed: {
-    ...mapGetters(['selectedProject']),
-  },
+
   watch: {
-    selectedProject: {
-    handler(newProject) {
-      this.renderGanttChart(newProject);
-    },
-    deep: true,
-    immediate: true,
-    },
+    todoList: {
+      handler(newTodoList) {
+        if (newTodoList) {
+          this.renderGanttChart(newTodoList);
+        }
+      },
+      immediate: true
+    }
   },
   methods: {
-    async renderGanttChart(selectedProject) {
+    handleTaskUpdated(){
+      this.renderGanttChart(this.todoList);
+    },
+    renderGanttChart(newTodoList) {
       gantt.clearAll();
-      try {
-        const payload = {
-          t_key: this.key,
-          project_num: selectedProject.project_num
-        };
-        const response = await axios.post("http://localhost:8030/api/getAllTodoList", payload);
-  
-        const transformedTasks = response.data.map(task => ({
+        const transformedTasks = newTodoList.map(task => ({
           id: task.todo_num,
           text: task.todo_title,
           start_date: this.$store.getters.formatDate(task.start_date),
@@ -60,40 +53,12 @@ export default {
           member: task.member_name,
           status: task.status,
           content: task.content,
-          project_manager : this.selectedProject.project_manager
+          project_manager : this.project.project_manager
         }));
         this.tasks = { data: transformedTasks };
         gantt.parse(this.tasks);
-      } catch (error) {
-        console.error("Gantt chart data fetch failed", error);
-      }
     }
-  },
-    
-    
-    
-    
-    addMessage (message) {
-      this.messages.unshift(message)
-      if (this.messages.length > 40) {
-        this.messages.pop()
-      }
-    },
-
-    logTaskUpdate (id, mode, task) {
-      let text = (task && task.text ? ` (${task.text})`: '')
-      let message = `Task ${mode}: ${id} ${text}`
-      this.addMessage(message)
-    },
-
-    logLinkUpdate (id, mode, link) {
-      let message = `Link ${mode}: ${id}`
-      if (link) {
-        message += ` ( source: ${link.source}, target: ${link.target} )`
-      }
-      this.addMessage(message)
-    },
-   
+  }
   }
 </script> 
 
