@@ -1,22 +1,24 @@
 <template>
   <div class="tl-container">
-    <SideBar @projectSelected="getTodoList"></SideBar>
-    <div class="tab">
-      <button class="tab-btn1" @click="viewTimeline()">Time Line</button>
-      <button class="tab-btn2" @click="viewCalendar()">Calendar</button>
-      <span class="tab-detail-btn" @click="openProjectSettingModal">상세보기</span>
-        <CheckAndModifyModal :project="selectedProject" :visible="showProjectSettingModal"
-        @close="closeProjectSettingModal"></CheckAndModifyModal>
-    </div>
-    <div>
-      <GanttConfig v-if="isTimeLine && selectedProject" :project="selectedProject" :todoList="todoList"
-      @task-changed="getTodoList(selectedProject)">
-      </GanttConfig>
-      <div class="cal">
-        <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
-        </FullCalendar>
-      </div>
-    </div>
+      <SideBar @projectSelected="getTodoList"></SideBar>
+        <div class="tab">
+            <button class="tab-btn1" @click="viewTimeline()">Time Line</button>
+            <button class="tab-btn2" @click="viewCalendar()">Calendar</button>
+            <span class="tab-detail-btn" @click="openProjectSettingModal">상세보기</span>
+              <CheckAndModifyModal :project="selectedProject" :visible="showProjectSettingModal"
+              @close="closeProjectSettingModal">
+            </CheckAndModifyModal>
+        </div>
+        <div>
+            <GanttConfig v-if="isTimeLine && selectedProject" :project="selectedProject" :todoList="todoList"
+            @task-changed="getTodoList(selectedProject)">
+            </GanttConfig>
+            <div class="cal">
+              <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
+              </FullCalendar>
+
+            </div>
+        </div>
   </div>
 </template>
 
@@ -104,7 +106,7 @@ export default {
 
 <style>
 .tl-container{
-  margin-top:88px;
+    margin-top: 47px;
 }
 
 .tab-btn1{
@@ -153,4 +155,9 @@ export default {
     border: 2px solid #376d33a6;
     color: #1a4408b9;
 }
+
+.cal{
+  min-width: 1000px;
+}
+
 </style>

@@ -1,57 +1,59 @@
 <template>
   <div class="g-container">
-    <div class="custom-radio">
-            <input
-              type="radio"
-              id="scale1"
-              class="gantt_radio"
-              name="scale"
-              value="day"
-              v-model="selectedScale"
-            />
-            <label for="scale1">일별</label>
-  
-            <input
-              type="radio"
-              id="scale2"
-              class="gantt_radio"
-              name="scale"
-              value="week"
-              v-model="selectedScale"
-            />
-            <label for="scale2">주별</label>
-  
-            <input
-              type="radio"
-              id="scale3"
-              class="gantt_radio"
-              name="scale"
-              value="month"
-              v-model="selectedScale"
-            />
-            <label for="scale3">달별</label>
-  
-            <input
-              type="radio"
-              id="scale4"
-              class="gantt_radio"
-              name="scale"
-              value="quarter"
-              v-model="selectedScale"
-            />
-            <label for="scale4">분기별</label>
-  
-            <input
-              type="radio"
-              id="scale5"
-              class="gantt_radio"
-              name="scale"
-              value="year"
-              v-model="selectedScale"
-            />
-            <label for="scale5">연도별</label>
-        </div>
-     <div ref="gantt" id="gantt-c" :class="{ 'no-project': isNoProject }"></div>
+  <div>
+      <div class="custom-radio">
+              <input
+                type="radio"
+                id="scale1"
+                class="gantt_radio"
+                name="scale"
+                value="day"
+                v-model="selectedScale"
+              />
+              <label for="scale1">일별</label>
+    
+              <input
+                type="radio"
+                id="scale2"
+                class="gantt_radio"
+                name="scale"
+                value="week"
+                v-model="selectedScale"
+              />
+              <label for="scale2">주별</label>
+    
+              <input
+                type="radio"
+                id="scale3"
+                class="gantt_radio"
+                name="scale"
+                value="month"
+                v-model="selectedScale"
+              />
+              <label for="scale3">달별</label>
+    
+              <input
+                type="radio"
+                id="scale4"
+                class="gantt_radio"
+                name="scale"
+                value="quarter"
+                v-model="selectedScale"
+              />
+              <label for="scale4">분기별</label>
+    
+              <input
+                type="radio"
+                id="scale5"
+                class="gantt_radio"
+                name="scale"
+                value="year"
+                v-model="selectedScale"
+              />
+              <label for="scale5">연도별</label>
+          </div>
+    </div>
+    <div ref="gantt" class="gantt-c"></div>
   </div>
 </template>
 
@@ -259,7 +261,7 @@ export default {
           ],
         },
         { name: "period", height: 72, type: "time", time_format: ["%Y", "%m", "%d"],
-        map_to:{start_date:"start_date",end_date:"end_date"}},
+          map_to:{start_date:"start_date",end_date:"end_date"}},
       ];
       gantt.locale.labels.section_description = "할 일";
       gantt.locale.labels.section_content = "세부 설명";
@@ -272,7 +274,7 @@ export default {
         task.end_date = new Date(task.end_date);
         return true;
       });
-      //todo 모달창 열때 기본값
+
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
         task.member = this.$store.state.loginMember.member_name;
@@ -350,10 +352,9 @@ export default {
 
 <style>
 @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css";
-#gantt-c {
-  width: 100%;
-  height: 800px;
-  min-height: 600px;
+.gantt-c {
+    width: 100%;
+    height: 760px;
 }
 
 /* /////////////////////////////////////////// radio */
@@ -428,24 +429,15 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     font-size: 13px;
+    padding-right: none !important;
 }
 
-/* 프로젝트가 없을 때의 스타일 */
-#gantt-c.no-project .gantt_grid_head_add {
-  display: none !important;
-}
-
-/* 프로젝트가 있을 때의 스타일 */
-.gantt_grid_head_add {
-  width: 98%;
-  height: 100%;
-  background-image: url(https://img.icons8.com/material-outlined/24/plus--v0.png);
-  background-position: 50%;
-  background-repeat: no-repeat;
-  cursor: pointer;
-  position: relative;
-  -moz-opacity: .3;
-  opacity: 0.3;
+.gantt_grid_head_add { /* plus 이미지 버튼 */
+    background-image: url(https://img.icons8.com/material-outlined/24/plus--v0.png);
+    background-position: 50%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    position: relative;
 }
 
 .gantt_add{
@@ -466,10 +458,6 @@ export default {
     line-height: inherit;
     overflow: hidden;
     height: 100%;
-}
-
-.gantt_row .gantt_cell[data-column-name="start_date"] {
-    width: 77px !important;
 }
 
 /*/////////////////// task */
@@ -514,13 +502,16 @@ export default {
     height: 250px;
     padding: 32px 13px 44px 13px;
 }
+.gantt_cal_light .gantt_title {
+    padding-left: 17px;
+}
 span.gantt_title {
     letter-spacing: 3px;
-    padding: 10px 20px;
-    background: #8080800d;
+    padding: 10px 11px 10px 20px;
+    background: #8080801f;
     border-radius: 17px;
     font-size: 11px;
-    color: #63606070;
+    color: #636060cf;
 }
 .gantt_cal_ltitle {
     padding: 36px 0px 10px 0px;
@@ -539,10 +530,44 @@ span.gantt_title {
     border-top-right-radius: 6px;
     border-bottom-right-radius: 0;
 }
-
+.gantt_add {
+    display: none;
+}
 .gantt_cal_larea .gantt_cal_ltext{
     height: 23px !important;
 }
+.gantt_grid_head_text[data-column-id="text"]{
+    width: 148px !important;
+}
+.gantt_grid_head_member[data-column-name="member"]{
+    width: 90px !important;
+}
+.gantt_cell[data-column-name="member"] {
+    width: 75px !important;
+    text-align: center !important; 
+    justify-content:center !important;
+}
+.gantt_cell.gantt_cell_tree[data-column-name="text"][role="gridcell"]{
+    width: 155px !important;
+}
+.gantt_last_cell[data-column-name="add"][data-column-index="4"]{
+    width: 30px !important;
+}
+.gantt_row .gantt_cell[data-column-name="start_date"] {
+    width: 92px !important;
+}
+.gantt_grid_head_start_date[data-column-name="start_date"][data-column-index="2"] {
+    width: 80px !important;
+}
+.gantt_cell[data-column-name="end_date"] {
+    width: 100px !important;
+    text-align: center;
+    justify-content: center;
+}
+.gantt_grid_head_end_date[data-column-name="end_date"][data-column-index="3"] {
+    width: 100px !important;
+}
+
 .gantt_cal_larea {
     height: 431px !important;
     border: none;
@@ -552,10 +577,12 @@ span.gantt_title {
     overflow: hidden;
     height: 1px;
 }
-
+.gantt_tree_icon.gantt_blank {
+    width: 0px;
+}
 .gantt_cal_lsection {
     font-size: 12px;
-    color: #001b0552;
+    color: #001b05a3;
     font-weight: 700;
     padding: 14px 0 0px 22px;
 }
@@ -577,7 +604,7 @@ span.gantt_title {
     padding: 6px 0px 6px 15px;
 }
 .gantt_cal_ltext {
-    padding: 8px 21px;
+    padding: 9px 21px;
     overflow: hidden;
 }
 .gantt_section_time {
@@ -654,11 +681,11 @@ div[role="button"][aria-label="저장"] {
 .gantt_cal_light select {
     font-family: Arial;
     border: 1px solid #cececeb8;
-    font-size: 12px;
-    padding: 4px;
+    font-size: 11px;
+    padding: 4px 4px 4px 9px;
     margin: -1px;
     border-radius: 16px;
-    width: 23% !important;
+    width: 27% !important;
 }
 
 .gantt_btn_set[role="button"][aria-label="삭제"] {

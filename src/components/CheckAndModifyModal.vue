@@ -35,17 +35,18 @@
                                   <tr>
                                     <th>참여 인원</th>
                                     <div v-if="isEditMode">
-                                      <td @click="openMemberSearchModal" class="click-add">
+                                      <td @click="openMemberSearchModal" class="click-add" id="tooltip-container">
                                         <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
-                                          {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>
+                                          {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>                              
                                         </span>
+                                        <span id="tooltip">edit</span>
                                       </td>
-                                        </div>
-                                        <div v-else>
-                                          <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
-                                          {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>
-                                        </span>
-                                        </div>
+                                    </div>
+                                    <div v-else>
+                                      <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
+                                        {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>
+                                      </span>
+                                    </div>
                                 </tr>
                                 <tr>
                                   <th>시작일</th>
@@ -428,6 +429,7 @@
     letter-spacing: 1px;
     font-size: 11px;
     font-weight: 600;
+    margin: 0px 0px 0px 11px;
 }
 .cancel-btn {
   margin-left: 10px;
@@ -447,7 +449,46 @@
 }
 
 .selected-member{
-  font-size: small;
+  font-size: 11px;
 }
-  </style>
+
+#tooltip-container {
+  position: relative;
+  display: inline-block;
+  margin: auto;
+}
+
+#tooltip {
+  display: none;
+  position: absolute;
+  transform: translateX(-30%);
+  background-color: white;
+  color: #0c1e0ab5;
+  padding: 15px 10px;
+  border-radius: 40px;
+  white-space: nowrap;
+  font-size: 10px;
+  border: 3px dotted #184e0178;
+  letter-spacing: 2px;
+  font-weight: 600;
+  bottom: 100%;
+  left: 248%;
+  margin-left: -112px;
+}
+
+#tooltip::before {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 7px;
+  border-color: transparent transparent #2a930dbd transparent;
+  left: 16px;
+  top: 121%;
+  transform: translateY(-50%);
+}
+
+#tooltip-container:hover #tooltip {
+  display: block;
+}
+</style>
   
