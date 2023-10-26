@@ -15,12 +15,14 @@ b { /* used for event dates/times */
 /* Calendar */
 .app-main {
   flex-grow: 1;
-  /* padding: 2em 0em 1em 2em; */
-  padding: 2em 0em 1em 14em;
+  padding: 1.5em 0em 1em 14em;
 }
 .fc {
-    max-width: 1100px;
-    margin: 6px 0px;
+  max-width: 1100px;
+  margin: 6px 0px;
+  border: 1px solid #1c53221a;
+  padding: 23px 30px;
+  border-radius: 5px;
 }
 
 .fc .fc-toolbar.fc-header-toolbar {
