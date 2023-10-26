@@ -96,8 +96,4 @@ export default {
 <style scoped>
 @import url("../assets/css/sidebar.css");
 
-.project-title:hover{
-  cursor: pointer;
-}
-
 </style>

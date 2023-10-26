@@ -2,13 +2,13 @@
     float: left;
     padding: 60px 0px 0px 25px;
     width: 130px;
-    height: calc(100vh);
-    margin-top: -65px;
+    margin-top: -45px;
     width: 180px;
     line-height: 1.5;
     background: #d6ddd630;
     border-right: 2px solid #09550914;
     border-radius: 0px 25px 25px 0px;
+    height: 128vh;
 }
 
 #sideBar ul {
@@ -68,3 +68,6 @@
     letter-spacing: 0px;
 }
 
+.project-title:hover{
+    cursor: pointer;
+}
