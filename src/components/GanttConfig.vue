@@ -51,7 +51,7 @@
             />
             <label for="scale5">연도별</label>
         </div>
-    <div ref="gantt" class="gantt-c"></div>
+     <div ref="gantt" id="gantt-c" :class="{ 'no-project': isNoProject }"></div>
   </div>
 </template>
 
@@ -72,6 +72,11 @@ export default {
       updatingTask: false,
       tasks: { data: [] }
     };
+  },
+  computed: {
+    isNoProject() {
+      return this.project == null; // null 또는 undefined일 때 true를 반환
+    }
   },
   watch: {
     selectedScale(newValue) {
@@ -102,7 +107,7 @@ export default {
       immediate: true
     }
   },
-    methods: {
+  methods: {
       //selectedScale
     setDayScale() {
       gantt.config.scale_unit = "day";
@@ -202,7 +207,15 @@ export default {
         }));
         this.tasks = { data: transformedTasks };
         gantt.parse(this.tasks);
+    },
+    setGridHeaderClass(columnName) {
+      console.log(columnName);
+    if (columnName === 'add' && !this.project) {
+      return "no-project";
+    }else{
+      return "";
     }
+  }
     },
 
     mounted() {
@@ -214,7 +227,7 @@ export default {
         { name: "member", label: "member", align: "center" },
         { name: "start_date", label: "Start time", align: "center" },
         { name: "end_date", label: "End time", align: "center" },
-        { name: "add", label: "" },
+        { name: "add", label: ""},
       ];
       gantt.config.grid_width = 450;
       gantt.config.scrollable = true;
@@ -234,7 +247,7 @@ export default {
 
       //todo 추가 모달창 - 구성
       gantt.config.lightbox.sections = [
-        { name: "description", height: 38, map_to: "text", type: "textarea" },
+        { name: "description", height: 38, map_to: "text", type: "textarea"},
         { name: "content", height: 38, map_to: "content", type: "textarea" },
         { name: "project_manager", height: 16, type: "template", map_to: "project_manager"},
         { name: "member", height: 60, type: "template", map_to: "member"},
@@ -254,7 +267,6 @@ export default {
       gantt.locale.labels.section_member = "담당자";
       gantt.locale.labels.section_priority = "진행 상황";
       gantt.locale.labels.section_period = "시작일과 마감일";
-
       gantt.attachEvent("onTaskLoading", function (task) {
         task.start_date = new Date(task.start_date);
         task.end_date = new Date(task.end_date);
@@ -264,6 +276,7 @@ export default {
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
         task.member = this.$store.state.loginMember.member_name;
+        task.text='';
         return true;
       });
       gantt.templates.task_text = function(start,end,task){
@@ -271,10 +284,15 @@ export default {
       };
 
       gantt.attachEvent("onLightboxSave", (id, task, is_new) => {
+        // 입력값 검사
+        if (!task.text) {
+          alert('할 일을 입력해주세요.');
+          return false; // 저장 취소
+        }
         const sendtask = {
           todo_num: id,
           todo_title: task.text,
-          status: task.status, 
+          status: task.status,
           start_date: this.$store.getters.formatDate(task.start_date), 
           due_date: this.$store.getters.formatDate(task.end_date),
           member_name: task.member,
@@ -308,6 +326,16 @@ export default {
         this.$emit(`${entity}-updated`, id, action, data);
       });
 
+      gantt.templates.grid_header_class = this.setGridHeaderClass;
+
+      gantt.attachEvent("onGanttRender", function() {
+      var element = document.querySelector('.gantt_grid_head_add');
+      if (element) {
+        element.setAttribute('aria-label', '새로운 이름');
+      }
+    });
+
+
       //초기화
       gantt.init(this.$refs.gantt);
 
@@ -316,15 +344,16 @@ export default {
       if (this.todoList && this.todoList.length > 0) {
         this.renderGanttChart(this.todoList);
       }
-    },
+    }
 }
 </script>
 
 <style>
 @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css";
-.gantt-c {
+#gantt-c {
   width: 100%;
   height: 800px;
+  min-height: 600px;
 }
 
 /* /////////////////////////////////////////// radio */
@@ -365,11 +394,6 @@ export default {
 }
 /* /////////////////////////////////////////// end radio */
 
-
-.gantt-c {
-  min-height: 600px;
-}
-
 .gantt_row.odd{ /* 짝수 행마다 회색*/
     background-color:#f4f4fb4b;
 }
@@ -406,17 +430,28 @@ export default {
     font-size: 13px;
 }
 
-.gantt_add, .gantt_grid_head_add { /* plus 이미지 버튼 */
-    width: 98%;
-    height: 100%;
-    background-image: url(https://img.icons8.com/material-outlined/24/plus--v0.png);
-    background-position: 50%;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    position: relative;
-    -moz-opacity: .3;
-    opacity: 0.1;
+/* 프로젝트가 없을 때의 스타일 */
+#gantt-c.no-project .gantt_grid_head_add {
+  display: none !important;
 }
+
+/* 프로젝트가 있을 때의 스타일 */
+.gantt_grid_head_add {
+  width: 98%;
+  height: 100%;
+  background-image: url(https://img.icons8.com/material-outlined/24/plus--v0.png);
+  background-position: 50%;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  position: relative;
+  -moz-opacity: .3;
+  opacity: 0.3;
+}
+
+.gantt_add{
+    display: none;
+}
+
 
 .gantt_data_area {
     position: relative;
@@ -687,11 +722,7 @@ div[role="button"][aria-label="저장"] {
 }
 
 /*////////////////// + modal */ 
-/* html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  } */
+
   .g-container {
     display: flex;
     flex-direction: column;

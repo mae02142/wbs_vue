@@ -43,11 +43,11 @@
                                 </tr>
                                 <tr>
                                     <th>시작일</th>
-                                    <td><input type="date" class="date-picker" v-model="start_date"></td>
+                                    <td><input type="date" class="date-picker" v-model="start_date" :max="due_date"></td>
                                 </tr>
                                 <tr>
                                     <th>마감일</th>
-                                    <td><input type="date" class="date-picker" v-model="due_date"></td>
+                                    <td><input type="date" class="date-picker" v-model="due_date" :min="start_date"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -57,7 +57,7 @@
                     @update-selected-members="updateSelectedMembers">
                     </MemberSearchModal>
                     <div class="create-btn"> 
-                    <button @click="createProject">확인</button>
+                    <button @click="createProject($event)">확인</button>
                     </div>
         </div>
       </div>
@@ -78,10 +78,6 @@
         type: Boolean,
         default: false
       },
-      // daysInMonth: {
-      //   type: Number,
-      //   required: true
-      // }
     },
     data() {
       return {
@@ -93,8 +89,7 @@
         member:'',
         selectedMembers: [],
         hasSelectedMembers: false,
-        //프로젝트 진행 상태
-        selectedStatus: 'todo',  // 기본값을 'all'로 설정
+        selectedStatus: 'todo',
         statusOptions: [
         { value: 'todo', text: '해야 할 일' },
         { value: 'ongoing', text: '진행중' },
@@ -144,7 +139,13 @@
       }
       },
       //프로젝트 생성
-      async createProject() {
+      async createProject(event) {
+        const inputs = [this.project_title, this.start_date, this.due_date];
+          if (inputs.some(input => input === null || input === '')) {
+          alert('하나 이상의 입력 필드가 비어 있습니다');
+          event.preventDefault();
+          return;
+        }
         try {
           const projectDTO = {
               project_title: this.project_title,
@@ -161,14 +162,14 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
+        this.setClearData();
         this.$emit('close');
-
-        
       } catch (error) {
         console.log(error);
       }
     },
-    }  
+
+    }
   };
   </script>
   

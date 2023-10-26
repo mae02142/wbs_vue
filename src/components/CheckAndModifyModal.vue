@@ -74,7 +74,7 @@
                         <button  @click="confirmDeletion">삭제</button>
                       </div>
                       <div v-else-if="isEditMode&&this.loginMember.member_num==this.project.member_num">
-                        <button @click="saveChanges">확인</button>
+                        <button @click="saveChanges($event)">확인</button>
                         <button class="cancel-btn" @click="close">취소</button>
                       </div>
                     </div>
@@ -195,7 +195,13 @@
     this.selectedStatus = this.localProject.status;
   },
 
-  async saveChanges() {
+  async saveChanges(event) {
+    const inputs = [this.project_title, this.start_date, this.due_date];
+          if (inputs.some(input => input === null || input === '')) {
+          alert('하나 이상의 입력 필드가 비어 있습니다');
+          event.preventDefault();
+          return;
+        }
     try {
       // 수정된 내용 서버로 전송
       const projectDTO = {
@@ -248,8 +254,8 @@
       } catch (error) {
         console.error('프로젝트 삭제 실패:', error);
       }
-    },
-  },
+    }
+  }
   }
   
   </script>

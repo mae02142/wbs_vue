@@ -12,8 +12,10 @@
       <GanttConfig v-if="isTimeLine && selectedProject" :project="selectedProject" :todoList="todoList"
       @task-changed="getTodoList(selectedProject)">
       </GanttConfig>
-      <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
-      </FullCalendar>
+      <div class="cal">
+        <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
+        </FullCalendar>
+      </div>
     </div>
   </div>
 </template>
@@ -86,7 +88,11 @@ export default {
     }
   },
     openProjectSettingModal(){
-    this.showProjectSettingModal=true;
+      if (this.selectedProject && this.selectedProject.project_num) {
+      this.showProjectSettingModal=true;
+    } else {
+      alert('먼저 프로젝트를 선택해주세요.');
+    }
     },
     closeProjectSettingModal(){
       this.showProjectSettingModal=false;
@@ -147,5 +153,4 @@ export default {
     border: 2px solid #376d33a6;
     color: #1a4408b9;
 }
-
 </style>
