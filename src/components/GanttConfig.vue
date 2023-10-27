@@ -433,11 +433,15 @@ export default {
 }
 
 .gantt_grid_head_add { /* plus 이미지 버튼 */
-    background-image: url(https://img.icons8.com/material-outlined/24/plus--v0.png);
+    background-image: url('../assets/icon/add_btn.png');
+    background-size: 80% 70%;
     background-position: 50%;
     background-repeat: no-repeat;
     cursor: pointer;
     position: relative;
+    -moz-opacity: .6;
+    opacity: .6;
+    top: 0;
 }
 
 .gantt_add{

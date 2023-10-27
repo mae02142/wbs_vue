@@ -28,20 +28,24 @@
                     <div>
                         <table class="status-table">
                             <tbody class="s-body">
-                                <tr>
+                                <tr> 
                                     <th>PM</th>
                                     <td class="pm-member">{{ project.project_manager }}</td>
                                   </tr>
                                   <tr>
                                     <th>참여 인원</th>
                                     <div v-if="isEditMode">
-                                      <td @click="openMemberSearchModal" class="click-add" id="tooltip-container">
-                                        <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
-                                          {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>                              
-                                        </span>
-                                        <span id="tooltip">edit</span>
+                                      <td @click="openMemberSearchModal" class="click-add" id="tooltip-container" 
+                                          @mouseover="showTooltipMethod" @mousemove="moveTooltip" @mouseleave="hideTooltip">
+                                          <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
+                                              {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>                              
+                                          </span>
+                                          <span v-if="tooltipVisible" class="tooltip" :style="tooltipStyle">
+                                              edit
+                                          </span>                                             
                                       </td>
                                     </div>
+
                                     <div v-else>
                                       <span v-for="member in selectedMembers" :key="member.member_num" class="selected-member">
                                         {{ member.div_name }} {{ member.member_name }} {{ member.rank }}<br>
@@ -111,69 +115,95 @@
         isEditMode: false,
         showMemberSearchModal: false,
         selectedMembers: [],
+
+        tooltipVisible: false,
+        tooltipStyle: {
+            top: "0px",
+            left: "0px",
+        },
+
         //프로젝트 진행 상태
         selectedStatus: 'todo',  // 기본값을 'all'로 설정
         statusOptions: [
         { value: 'todo', text: '해야 할 일' },
         { value: 'ongoing', text: '진행중' },
         { value: 'done', text: '완료' },
-      ],
+        ],
       };
     },
     watch: {
-    visible(newVal) {
-      if (newVal) {  // visible이 true가 될 때
-        this.participatedMemberList();
-      }
+      visible(newVal) {
+        if (newVal) {  // visible이 true가 될 때
+          this.participatedMemberList();
+        }
+      },
     },
-  },
-  computed: {
-    loginMember() {
-    return this.$store.state.loginMember;
-  },
-  formattedStartDate: {
-    get() {
-      return this.$store.getters.formatDate(this.project.start_date);
+    computed: {
+      loginMember() {
+        return this.$store.state.loginMember;
     },
-    set(value) {
-      this.localProject.start_date = this.$store.getters.formatDate(value);
+      formattedStartDate: {
+      get() {
+        return this.$store.getters.formatDate(this.project.start_date);
+      },
+      set(value) {
+        this.localProject.start_date = this.$store.getters.formatDate(value);
+      },
     },
-  },
-  formattedDueDate: {
-    get() {
-      return this.$store.getters.formatDate(this.project.due_date);
+    formattedDueDate: {
+      get() {
+        return this.$store.getters.formatDate(this.project.due_date);
+      },
+      set(value) {
+        this.localProject.due_date = this.$store.getters.formatDate(value);
+      },
     },
-    set(value) {
-      this.localProject.due_date = this.$store.getters.formatDate(value);
-    },
+    projectData() {
+      return this.$store.state.selectedProject;
+    }
   },
-  projectData() {
-    return this.$store.state.selectedProject;
-  }
-  },
-    methods: {
+  methods: {
     updateSelectedMembers(updatedMembers) {
       this.selectedMembers = updatedMembers;
       this.hasSelectedMembers = this.selectedMembers.length > 0;
       console.log("selectedMembers",this.selectedMembers);
-  },
-      forTest(temp){
+    },
+
+    showTooltipMethod() {
+      this.tooltipVisible = true;
+      console.log("tooltip1");
+    },
+    moveTooltip(event) {
+      if (this.tooltipVisible) {
+        this.tooltipStyle.top = event.clientY + 10 + "px"; // 원하는 위치로 조정
+        this.tooltipStyle.left = event.clientX + "px";
+        console.log("tooltip2");
+      }
+    },
+    hideTooltip() {
+      this.tooltipVisible = false;
+      console.log("tooltip3");
+    },
+
+
+    forTest(temp){
       console.log("key : " + temp);
       this.key = temp;
       this.participatedMemberList();
     },
 
-      close() {
-        this.isEditMode=false;
-        this.$emit('close');
-      },
-      openMemberSearchModal() {
+    close() {
+      this.isEditMode=false;
+      this.$emit('close');
+    },
+    openMemberSearchModal() {
       this.showMemberSearchModal = true;
-      },
+    },
 
-      closeMemberSearchModal() {
+    closeMemberSearchModal() {
       this.showMemberSearchModal = false;
     },
+    
     async participatedMemberList(){
       try {
         const response = await axios.post("http://localhost:8030/api/participatedMemberList",{
@@ -454,41 +484,38 @@
 
 #tooltip-container {
   position: relative;
-  display: inline-block;
-  margin: auto;
+}
+.tooltip {
+    display: block;
+    letter-spacing: -1px;
+    position: absolute;
+    background-color: white;
+    color: #1c2b20c2;
+    padding: 11px 8px;
+    border-radius: 40px;
+    white-space: nowrap;
+    font-size: 10px;
+    border: 3px dotted #184e0178;
+    letter-spacing: 1px;
+    font-weight: 600;
+    top: -55%;
+    transform: translateX(15%);
+    transform: translateY(48%);
+    position: fixed;
+    z-index: 1000;
 }
 
-#tooltip {
-  display: none;
-  position: absolute;
-  transform: translateX(-30%);
-  background-color: white;
-  color: #0c1e0ab5;
-  padding: 15px 10px;
-  border-radius: 40px;
-  white-space: nowrap;
-  font-size: 10px;
-  border: 3px dotted #184e0178;
-  letter-spacing: 2px;
-  font-weight: 600;
-  bottom: 100%;
-  left: 248%;
-  margin-left: -112px;
+.tooltip::before {
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-width: 5px;
+    border-color: transparent transparent #21750a9e transparent;
+    left: 51%;
+    bottom: 42px;
+    transform: translateX(-53%);
 }
 
-#tooltip::before {
-  content: '';
-  position: absolute;
-  border-style: solid;
-  border-width: 7px;
-  border-color: transparent transparent #2a930dbd transparent;
-  left: 16px;
-  top: 121%;
-  transform: translateY(-50%);
-}
 
-#tooltip-container:hover #tooltip {
-  display: block;
-}
 </style>
   
