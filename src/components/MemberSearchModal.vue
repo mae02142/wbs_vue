@@ -87,7 +87,6 @@ export default {
 },
   methods: {
     forTest(temp){
-      console.log("key : " + temp);
       this.key = temp;
       this.searchAllMember();
     },
@@ -121,7 +120,6 @@ export default {
       };
 
       const response = await axios.post("http://localhost:8030/api/searchMember",payload);
-      console.log(response.data);
       this.members = [];
       this.members = response.data;
     } catch (error) {

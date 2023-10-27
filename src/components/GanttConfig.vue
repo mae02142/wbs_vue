@@ -179,7 +179,6 @@ export default {
       },
       //todo 삭제
       async deleteTaskonServer(task) {
-        console.log("deleteTaskonServer>>",task);
         try {
           await axios.post("http://localhost:8030/api/deleteTodo",
             {
@@ -211,7 +210,6 @@ export default {
         gantt.parse(this.tasks);
     },
     setGridHeaderClass(columnName) {
-      console.log(columnName);
     if (columnName === 'add' && !this.project) {
       return "no-project";
     }else{
@@ -221,7 +219,6 @@ export default {
     },
 
     mounted() {
-      /////언어 설정하기
       gantt.i18n.setLocale("kr");
       gantt.config.date_format = "%Y-%m-%d";
       gantt.config.columns = [
@@ -269,11 +266,6 @@ export default {
       gantt.locale.labels.section_member = "담당자";
       gantt.locale.labels.section_priority = "진행 상황";
       gantt.locale.labels.section_period = "시작일과 마감일";
-      gantt.attachEvent("onTaskLoading", function (task) {
-        task.start_date = new Date(task.start_date);
-        task.end_date = new Date(task.end_date);
-        return true;
-      });
 
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
@@ -281,9 +273,18 @@ export default {
         task.text='';
         return true;
       });
+
       gantt.templates.task_text = function(start,end,task){
       return task.text;  
       };
+
+      gantt.attachEvent("onTaskLoading", function(task) {
+        console.log(task);
+        if (task.end_date) {
+          task.end_date.setHours(23, 59, 59);
+        }
+        return true;
+      });
 
       gantt.attachEvent("onLightboxSave", (id, task, is_new) => {
         // 입력값 검사
@@ -291,7 +292,11 @@ export default {
           alert('할 일을 입력해주세요.');
           return false; // 저장 취소
         }
-        const sendtask = {
+        // 상위 작업 (프로젝트)의 날짜 범위를 가져옵니다.
+          const StartedprojectDate = this.project.start_date;
+          const EndedprojectDate = this.project.due_date;
+        
+          const sendtask = {
           todo_num: id,
           todo_title: task.text,
           status: task.status,
@@ -301,6 +306,18 @@ export default {
           member_num: this.$store.state.loginMember.member_num,
           content: task.content
         };
+        // 시작 날짜 검사
+        if (sendtask.start_date < StartedprojectDate) {
+          alert('작업의 시작 날짜는 프로젝트의 시작 날짜 이후여야 합니다.');
+          return false; // 저장 취소
+        }
+
+        // 종료 날짜 검사
+        if (sendtask.due_date > EndedprojectDate) {
+          alert('작업의 종료 날짜는 프로젝트의 종료 날짜 이전이어야 합니다.');
+          return false; // 저장 취소
+        }
+
         if (is_new) {
             this.saveTaskToServer(sendtask);
           } else {
@@ -324,24 +341,27 @@ export default {
         return true; // 작업을 삭제
       });
 
+
+
       gantt.createDataProcessor((entity, action, data, id) => {
         this.$emit(`${entity}-updated`, id, action, data);
       });
-
       gantt.templates.grid_header_class = this.setGridHeaderClass;
+      gantt.config.drag_move = false;
+      gantt.config.drag_resize = false;
+      gantt.config.duration_step = 1;
+      gantt.config.duration_unit = "day";
+      gantt.config.min_duration = 24 * 60 * 60 * 1000;
 
-      gantt.attachEvent("onGanttRender", function() {
-      var element = document.querySelector('.gantt_grid_head_add');
-      if (element) {
-        element.setAttribute('aria-label', '새로운 이름');
-      }
-    });
-
+      gantt.templates.task_class = function(start, end) {
+        if (start.getTime() === end.getTime()) {
+          return "one-day-task";
+        }
+        return "";
+      };
 
       //초기화
       gantt.init(this.$refs.gantt);
-
-      
       // 데이터 렌더링
       if (this.todoList && this.todoList.length > 0) {
         this.renderGanttChart(this.todoList);
@@ -356,7 +376,9 @@ export default {
     width: 100%;
     height: 760px;
 }
-
+.one-day-task {
+  min-width: 66px !important;
+}
 /* /////////////////////////////////////////// radio */
 .custom-radio {
     font-size: 11px;

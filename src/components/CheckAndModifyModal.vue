@@ -8,7 +8,7 @@
                 <div v-if="!isEditMode"></div>
                 <div v-else class="todo">
                     <span>프로젝트명</span>
-                    <input v-model="project_title" placeholder="Modify Project Name"/>
+                    <input v-model="project_title" placeholder="Modify Project Name" @keyup.prevent="preventComma"/>
                 </div>
             </div>
             <div class="status">
@@ -51,14 +51,14 @@
                                 <tr>
                                   <th>시작일</th>
                                   <td v-if="isEditMode" class="date-picker">
-                                    <input type="date" class="date-picker" v-model="formattedStartDate">
+                                    <input type="date" class="date-picker" v-model="formattedStartDate" :max="formattedDueDate">
                                   </td>
                                   <td v-else class="date-picker">{{ formattedStartDate }}</td>
                                 </tr>
                                 <tr>
                                   <th>마감일</th>
                                   <td v-if="isEditMode" class="date-picker">
-                                    <input type="date" class="date-picker" v-model="formattedDueDate">
+                                    <input type="date" class="date-picker" v-model="formattedDueDate" :min="formattedStartDate">
                                   </td>
                                   <td v-else class="date-picker">{{ formattedDueDate }}</td>
                                 </tr>
@@ -203,6 +203,11 @@
           event.preventDefault();
           return;
         }
+        if (this.project_title.includes(',')) {
+          alert('프로젝트 제목에 쉼표(,)를 사용할 수 없습니다');
+          event.preventDefault();
+          return;
+        }
     try {
       // 수정된 내용 서버로 전송
       const projectDTO = {
@@ -214,14 +219,13 @@
       project_manager: this.localProject.project_manager,
       member_num: this.loginMember.member_num
     };
+    console.log("projectDTO>>>>",projectDTO);
       const members = this.selectedMembers.map(member => member.member_num);
       const response = await axios.post("http://localhost:8030/api/updateProject", {
         t_key: this.key,
         projectDTO: projectDTO,
         members: members
       });
-      console.log("saveChanges>>>>",response.data);
-
       alert("수정 완료");
 
       // 로컬 상태를 업데이트합니다.
@@ -246,14 +250,20 @@
     },
     async deleteProject() {
       try {
-        const response = await axios.post("http://localhost:8030/api/deleteProject",{
+        await axios.post("http://localhost:8030/api/deleteProject",{
         t_key: this.key,
         project_num:this.project.project_num 
       });
-        this.$store.commit('deleteProject', response.data);
+        this.$store.commit('deleteProject', this.project.project_num);
         this.$emit('close');
       } catch (error) {
         console.error('프로젝트 삭제 실패:', error);
+      }
+    },
+    preventComma(event){
+      if (event.key === ',') {
+        alert("제목에 특수문자 (,)를 사용할 수 없습니다.");
+        event.preventDefault();
       }
     }
   }

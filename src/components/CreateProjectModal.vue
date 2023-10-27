@@ -7,7 +7,7 @@
             <div class="m-left">
                 <div class="todo">
                     <span class="project-title">프로젝트명</span>
-                    <input v-model="project_title" placeholder="프로젝트명 입력"/>
+                    <input v-model="project_title" placeholder="프로젝트명 입력" @keyup.prevent="preventComma"/>
                 </div>
             </div>
                 <div class="status">
@@ -104,7 +104,6 @@
     updateSelectedMembers(updatedMembers) {
       this.selectedMembers = updatedMembers;
       this.hasSelectedMembers = this.selectedMembers.length > 0;
-      console.log("selectedMembers",this.selectedMembers);
   },
 
       close() {
@@ -130,7 +129,6 @@
       async searchPM(){
         try {
         const response = await axios.get("http://localhost:8030/api/createPM?t_key="+this.key);
-        console.log(response.data);
         this.member = response.data;
         this.$store.commit('setLoginMember', response.data);
 
@@ -143,6 +141,16 @@
         const inputs = [this.project_title, this.start_date, this.due_date];
           if (inputs.some(input => input === null || input === '')) {
           alert('하나 이상의 입력 필드가 비어 있습니다');
+          event.preventDefault();
+          return;
+        }
+        if (this.project_title.includes(',')) {
+          alert('프로젝트 제목에 쉼표(,)를 사용할 수 없습니다');
+          event.preventDefault();
+          return;
+        }
+        if(this.start_date===this.due_date){
+          alert('프로젝트 기간은 최소 2일 이상으로 선택하십시오');
           event.preventDefault();
           return;
         }
@@ -162,13 +170,23 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
+        window.ws.send(
+          this.members +","
+          + this.project_num +","
+          +this.project_title
+        );
         this.setClearData();
         this.$emit('close');
       } catch (error) {
         console.log(error);
       }
     },
-
+    preventComma(event){
+      if (event.key === ',') {
+        alert("제목에 특수문자 (,)를 사용할 수 없습니다.");
+        event.preventDefault();
+      }
+    }
     }
   };
   </script>

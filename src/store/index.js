@@ -1,6 +1,4 @@
 import { createStore } from 'vuex';
-
-
 export default createStore({
   state: {
     projectList: [],
@@ -18,6 +16,9 @@ export default createStore({
       if (day.length < 2) day = '0' + day;
 
       return [year, month, day].join('-');
+    },
+    parseDate: () => (string) => {
+      return new Date(string);
     },
     selectedProject: (state) => state.selectedProject
   },

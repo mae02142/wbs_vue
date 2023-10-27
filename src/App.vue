@@ -5,6 +5,8 @@
             <button class="tab-btn1" @click="viewTimeline()">Time Line</button>
             <button class="tab-btn2" @click="viewCalendar()">Calendar</button>
             <span class="tab-detail-btn" @click="openProjectSettingModal">상세보기</span>
+            <span v-if="selectedProject && selectedProject.start_date && selectedProject.due_date"
+            class="p-period">프로젝트 기간 : {{ selectedProject.start_date}} ~ {{selectedProject.due_date }}</span>
               <CheckAndModifyModal :project="selectedProject" :visible="showProjectSettingModal"
               @close="closeProjectSettingModal">
             </CheckAndModifyModal>
@@ -14,9 +16,9 @@
             @task-changed="getTodoList(selectedProject)">
             </GanttConfig>
             <div class="cal">
-              <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList">
+              <FullCalendar v-if="isCalendar && selectedProject" :project="selectedProject" :todoList="todoList"
+              @event-clicked="handleEventClicked">
               </FullCalendar>
-
             </div>
         </div>
   </div>
@@ -98,6 +100,9 @@ export default {
     },
     closeProjectSettingModal(){
       this.showProjectSettingModal=false;
+    },
+    handleEventClicked() {
+      this.viewTimeline();
     }
   }
 }
@@ -158,6 +163,13 @@ export default {
 
 .cal{
   min-width: 1000px;
+}
+
+.p-period{
+  margin-left: 5px;
+  font-size: small;
+  padding: 6px 18px;
+  color: #090c0787;
 }
 
 </style>

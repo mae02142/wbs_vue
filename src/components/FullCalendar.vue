@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import mixin from "../mixin";
 
+
 export default {
   mixins:[mixin],
   components: {
@@ -74,9 +75,10 @@ export default {
       }
     },
     handleEventClick(clickInfo) {
-      if (confirm(`'${clickInfo.event.title}' 일정을 삭제하시겠습니까?`)) {
-        clickInfo.event.remove()
-      }
+      // if (confirm(`'${clickInfo.event.title}' 일정을 삭제하시겠습니까?`)) {
+      //   clickInfo.event.remove();
+      // }
+      this.$emit('event-clicked', clickInfo.event);
     },
     closeModal() {
       this.showModal = false;
@@ -85,7 +87,6 @@ export default {
       this.showModal = true;
     },
     async resetCalendar(todos) {
-      console.log("리셋캘린더의 투두",todos);
      this.todoListforCal = todos.map((element) => {
     const startDate = new Date(element.start_date);
     startDate.setHours(0, 0, 0, 0);

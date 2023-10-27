@@ -3,7 +3,7 @@
 export default {
     data() {
       return {
-        key: '2cc9c0bc-fba4-4091-bd4d-f25177964c28',
+        key: '',
       };
     },
     mounted() {
@@ -11,9 +11,9 @@ export default {
     },
     methods: {
       checkInput() {
-        if(document.getElementsByName('tKey').length > 0  && document.getElementsByName('tKey')[0].value){
-          console.log(document.getElementsByName('tKey')[0].value);
-          this.getTodo(document.getElementsByName('tKey')[0].value);
+        if(document.getElementsByName('t_key').length > 0  && document.getElementsByName('t_key')[0].value){
+          console.log(document.getElementsByName('t_key')[0].value);
+          this.getTodo(document.getElementsByName('t_key')[0].value);
         } else {
           //console.log('not found input');
         }
