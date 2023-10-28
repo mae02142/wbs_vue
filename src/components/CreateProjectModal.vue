@@ -72,6 +72,7 @@
   export default {
     name:"CreateProjectModal",
     mixins:[mixin],
+    inject:["eventBus"],
     components:{MemberSearchModal},
     props: {
       visible: {
@@ -119,12 +120,16 @@
 
       },
       openMemberSearchModal() {
-      this.showMemberSearchModal = true;
+        this.showMemberSearchModal = true;
       },
 
       closeMemberSearchModal() {
-      this.showMemberSearchModal = false;
-    },
+        this.showMemberSearchModal = false;
+      },
+
+      triggerToast(param) {
+        this.eventBus.emit('toast-event', param);
+      },
     
       async searchPM(){
         try {
@@ -140,17 +145,17 @@
       async createProject(event) {
         const inputs = [this.project_title, this.start_date, this.due_date];
           if (inputs.some(input => input === null || input === '')) {
-          alert('하나 이상의 입력 필드가 비어 있습니다');
+          this.triggerToast({'type':2, 'text':'하나 이상의 입력 필드가 비어 있습니다'});
           event.preventDefault();
           return;
         }
         if (this.project_title.includes(',')) {
-          alert('프로젝트 제목에 쉼표(,)를 사용할 수 없습니다');
+          this.triggerToast({'type':4, 'text':'프로젝트 제목에 쉼표(,)를 사용할 수 없습니다'});
           event.preventDefault();
           return;
         }
         if(this.start_date===this.due_date){
-          alert('프로젝트 기간은 최소 2일 이상으로 선택하십시오');
+          this.triggerToast({'type':2, 'text':'프로젝트 기간은 최소 2일 이상으로 선택하십시오'});
           event.preventDefault();
           return;
         }
@@ -170,11 +175,11 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
-        window.ws.send(
-          this.members +","
-          + this.project_num +","
-          +this.project_title
-        );
+        // window.ws.send(
+        //   this.members +","
+        //   + this.project_num +","
+        //   +this.project_title
+        // );
         this.setClearData();
         this.$emit('close');
       } catch (error) {
@@ -183,7 +188,7 @@
     },
     preventComma(event){
       if (event.key === ',') {
-        alert("제목에 특수문자 (,)를 사용할 수 없습니다.");
+        this.triggerToast({'type':2, 'text':'제목에 특수문자 (,)를 사용할 수 없습니다.'});
         event.preventDefault();
       }
     }

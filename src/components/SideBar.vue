@@ -74,7 +74,24 @@ export default {
     async getProjectList(){
       try {
         const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-        this.$store.dispatch('updateProjectsData', response.data);
+        var dataList = response.data;
+        var today = new Date();
+        dataList.forEach(element => {
+          const startDate = new Date(element.start_date);
+          startDate.setHours(0, 0, 0, 0);
+          startDate.setDate(startDate.getDate() + 1);
+
+          const endDate = new Date(element.due_date);
+          endDate.setHours(0, 0, 0, 0);
+          endDate.setDate(endDate.getDate() + 1);
+
+          if (today > endDate) element.status = 'done'
+          else if (today < startDate) element.status = 'todo'
+          else element.status = 'ongoing'
+
+          console.log("element >>>>>>> ", element.status)
+        });
+        this.$store.dispatch('updateProjectsData', dataList);
       } catch (error) {
         console.log("Failed to Get Project List >>>>", error);
       }

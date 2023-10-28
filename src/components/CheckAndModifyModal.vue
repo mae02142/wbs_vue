@@ -97,6 +97,7 @@
   export default {
     name:"CheckAndModifyModal",
     mixins:[mixin],
+    inject:["eventBus"],
     components:{MemberSearchModal},
     props: {
     visible: {
@@ -163,6 +164,10 @@
     }
   },
   methods: {
+    triggerToast(param) {
+      this.eventBus.emit('toast-event', param);
+    },
+
     updateSelectedMembers(updatedMembers) {
       this.selectedMembers = updatedMembers;
       this.hasSelectedMembers = this.selectedMembers.length > 0;
@@ -229,12 +234,12 @@
   async saveChanges(event) {
     const inputs = [this.project_title, this.start_date, this.due_date];
           if (inputs.some(input => input === null || input === '')) {
-          alert('하나 이상의 입력 필드가 비어 있습니다');
+          this.triggerToast({'type':2, 'text':'하나 이상의 입력 필드가 비어 있습니다'});
           event.preventDefault();
           return;
         }
         if (this.project_title.includes(',')) {
-          alert('프로젝트 제목에 쉼표(,)를 사용할 수 없습니다');
+          this.triggerToast({'type':4, 'text':'프로젝트 제목에 쉼표(,)를 사용할 수 없습니다'});
           event.preventDefault();
           return;
         }
@@ -256,7 +261,7 @@
         projectDTO: projectDTO,
         members: members
       });
-      alert("수정 완료");
+      this.triggerToast({'type':3, 'text':'수정이 완료되었습니다.'});
 
       // 로컬 상태를 업데이트합니다.
       this.localProject.project_title = this.project_title;
@@ -282,7 +287,7 @@
       try {
         await axios.post("http://localhost:8030/api/deleteProject",{
         t_key: this.key,
-        project_num:this.project.project_num 
+        project_num: this.project.project_num 
       });
         this.$store.commit('deleteProject', this.project.project_num);
         this.$emit('close');
@@ -292,7 +297,7 @@
     },
     preventComma(event){
       if (event.key === ',') {
-        alert("제목에 특수문자 (,)를 사용할 수 없습니다.");
+        this.triggerToast({'type':4, 'text':'제목에 쉼표(,)를 사용할 수 없습니다'});
         event.preventDefault();
       }
     }

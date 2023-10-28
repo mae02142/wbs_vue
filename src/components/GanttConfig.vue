@@ -65,6 +65,7 @@ import mixin from "../mixin";
 export default {
   name: "GanttConfig",
   mixins: [mixin],
+  inject: ["eventBus"],
   props: {
     project: Object,
     todoList: Array
@@ -73,7 +74,7 @@ export default {
     return {
       selectedScale: "day",
       updatingTask: false,
-      tasks: { data: [] }
+      tasks: { data: [] },
     };
   },
   watch: {
@@ -204,6 +205,9 @@ export default {
         }));
         this.tasks = { data: transformedTasks };
         gantt.parse(this.tasks);
+    },
+    triggerToast(param){ // 알림창
+      this.eventBus.emit('toast-event', param);
     }
     },
 
@@ -277,7 +281,7 @@ export default {
 
       gantt.attachEvent("onLightboxSave", (id, task, is_new) => {
         if (!task.text) {
-          alert('할 일을 입력해주세요.');
+          this.triggerToast({'type':4,'text':'할 일을 선택해주세요'})
           return false; // 저장 취소
         }
         
@@ -295,12 +299,12 @@ export default {
         const StartedprojectDate = this.project.start_date;
         const EndedprojectDate = this.project.due_date;
         if (sendtask.start_date < StartedprojectDate) {
-          alert('작업의 시작 날짜는 프로젝트의 시작 날짜 이후여야 합니다.');
+          this.triggerToast({'type':4,'text':'작업의 시작 날짜는 프로젝트의 시작 날짜 이후여야 합니다.'})
           return false; // 저장 취소
         }
 
         if (sendtask.due_date > EndedprojectDate) {
-          alert('작업의 종료 날짜는 프로젝트의 종료 날짜 이전이어야 합니다.');
+          this.triggerToast({'type':4, 'text':'작업의 종료 날짜는 프로젝트의 종료 날짜 이전이어야 합니다.'});
           return false; // 저장 취소
         }
 

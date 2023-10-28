@@ -5,6 +5,8 @@ import store from './store/index';
 import axios from 'axios'
 import ganttastic from '@infectoone/vue-ganttastic'
 import mitt from 'mitt';
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
 
 const eventBus = mitt();
 
@@ -21,5 +23,11 @@ const app = createApp(App);
 
 // Provide the API client to all components
 app.provide('$apiClient', apiClient);
-app.provide('useMitt',eventBus);
-app.use(router).use(ganttastic).use(store).mount('#app');
+app.provide('eventBus',eventBus);
+app.use(Toast, {
+  transition: {
+    enter: "fade-enter-active",
+    leave: "Vue-Toastification__bounce-leave-active",
+    move: "fade-move"
+}
+}).use(router).use(ganttastic).use(store).mount('#app');

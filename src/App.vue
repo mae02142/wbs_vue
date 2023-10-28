@@ -32,11 +32,17 @@ import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
 import { mapState } from "vuex";
-
+import {useToast} from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 export default {
-  components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal},
+  components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal },
   mixins:[mixin],
+  inject: ["eventBus"],
+  setup() {
+    const toast = useToast();
+    return { toast }
+  },
   data() {
     return {
       todoList: [],
@@ -59,7 +65,52 @@ export default {
       immediate: true,
     }
   },
+  mounted(){
+    this.eventBus.on('toast-event', (param) => {
+      this.showToast(param);
+    })
+  },
   methods: {
+    // type 1 : info
+    // type 2 : error
+    // type 3 : success
+    // type 4 : warning
+    showToast(param){
+      var option =  {
+          position: "top-center",
+          timeout: 2000,
+          hideProgressBar: true,
+          pauseOnFocusLoss: false,
+        };
+      switch(param['type']){
+        case 1:
+          this.toast.info(param['text'],option);
+          break;
+        case 2:
+          this.toast.error(param['text'],option);
+          break;
+        case 3:
+          this.toast.success(param['text'],option);
+          break;
+        case 4:
+          this.toast.warning(param['text'],option);
+          break;
+      }
+    //   this.toast("Hi from LogRocket", {
+    //   position: "top-right",
+    //   timeout: 5000,
+    //   closeOnClick: true,
+    //   pauseOnFocusLoss: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   draggablePercent: 0.6,
+    //   showCloseButtonOnHover: false,
+    //   hideProgressBar: true,
+    //   closeButton: "button",
+    //   icon: "fas fa-rocket",
+    //   rtl: false
+    //  });
+    },
     async getTodoList(project) {
       try {
         const response = await axios.post("http://localhost:8030/api/getAllTodoList", 
@@ -73,29 +124,28 @@ export default {
         console.error("Failed to Get Todo List", error);
       }
     },
-
     viewTimeline() {
-    if (this.selectedProject && this.selectedProject.project_num) {
-      this.isTimeLine = true;
-      this.isCalendar = false;
-    } else {
-      alert('먼저 프로젝트를 선택해주세요.');
-    }
-  },
+      if (this.selectedProject && this.selectedProject.project_num) {
+        this.isTimeLine = true;
+        this.isCalendar = false;
+      } else {
+        this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
+      }
+    },
   
-  viewCalendar() {
-    if (this.selectedProject && this.selectedProject.project_num) {
-      this.isCalendar = true;
-      this.isTimeLine = false;
-    } else {
-      alert('먼저 프로젝트를 선택해주세요.');
-    }
-  },
+    viewCalendar() {
+      if (this.selectedProject && this.selectedProject.project_num) {
+        this.isCalendar = true;
+        this.isTimeLine = false;
+      } else {
+        this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
+      }
+    },
     openProjectSettingModal(){
       if (this.selectedProject && this.selectedProject.project_num) {
       this.showProjectSettingModal=true;
     } else {
-      alert('먼저 프로젝트를 선택해주세요.');
+      this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
     }
     },
     closeProjectSettingModal(){
@@ -107,7 +157,6 @@ export default {
   }
 }
 </script>
-
 
 <style>
 .tl-container{
