@@ -53,7 +53,7 @@
               <label for="scale5">연도별</label>
           </div>
     </div>
-    <div ref="gantt" class="gantt-c"></div>
+    <div ref="gantt" id="gantt-c"></div>
   </div>
 </template>
 
@@ -61,6 +61,7 @@
 import { gantt } from "dhtmlx-gantt";
 import axios from "axios";
 import mixin from "../mixin";
+
 export default {
   name: "GanttConfig",
   mixins: [mixin],
@@ -74,11 +75,6 @@ export default {
       updatingTask: false,
       tasks: { data: [] }
     };
-  },
-  computed: {
-    isNoProject() {
-      return this.project == null; // null 또는 undefined일 때 true를 반환
-    }
   },
   watch: {
     selectedScale(newValue) {
@@ -208,14 +204,7 @@ export default {
         }));
         this.tasks = { data: transformedTasks };
         gantt.parse(this.tasks);
-    },
-    setGridHeaderClass(columnName) {
-    if (columnName === 'add' && !this.project) {
-      return "no-project";
-    }else{
-      return "";
     }
-  }
     },
 
     mounted() {
@@ -287,16 +276,12 @@ export default {
       });
 
       gantt.attachEvent("onLightboxSave", (id, task, is_new) => {
-        // 입력값 검사
         if (!task.text) {
           alert('할 일을 입력해주세요.');
           return false; // 저장 취소
         }
-        // 상위 작업 (프로젝트)의 날짜 범위를 가져옵니다.
-          const StartedprojectDate = this.project.start_date;
-          const EndedprojectDate = this.project.due_date;
         
-          const sendtask = {
+        const sendtask = {
           todo_num: id,
           todo_title: task.text,
           status: task.status,
@@ -306,13 +291,14 @@ export default {
           member_num: this.$store.state.loginMember.member_num,
           content: task.content
         };
-        // 시작 날짜 검사
+        //날짜 검사
+        const StartedprojectDate = this.project.start_date;
+        const EndedprojectDate = this.project.due_date;
         if (sendtask.start_date < StartedprojectDate) {
           alert('작업의 시작 날짜는 프로젝트의 시작 날짜 이후여야 합니다.');
           return false; // 저장 취소
         }
 
-        // 종료 날짜 검사
         if (sendtask.due_date > EndedprojectDate) {
           alert('작업의 종료 날짜는 프로젝트의 종료 날짜 이전이어야 합니다.');
           return false; // 저장 취소
@@ -341,24 +327,14 @@ export default {
         return true; // 작업을 삭제
       });
 
-
-
       gantt.createDataProcessor((entity, action, data, id) => {
         this.$emit(`${entity}-updated`, id, action, data);
       });
-      gantt.templates.grid_header_class = this.setGridHeaderClass;
       gantt.config.drag_move = false;
       gantt.config.drag_resize = false;
       gantt.config.duration_step = 1;
       gantt.config.duration_unit = "day";
       gantt.config.min_duration = 24 * 60 * 60 * 1000;
-
-      gantt.templates.task_class = function(start, end) {
-        if (start.getTime() === end.getTime()) {
-          return "one-day-task";
-        }
-        return "";
-      };
 
       //초기화
       gantt.init(this.$refs.gantt);
@@ -372,12 +348,12 @@ export default {
 
 <style>
 @import "~dhtmlx-gantt/codebase/dhtmlxgantt.css";
-.gantt-c {
+#gantt-c {
     width: 100%;
     height: 760px;
 }
-.one-day-task {
-  min-width: 66px !important;
+.hide-add-button .gantt_grid_scale .gantt_grid_head_add {
+    display: none;
 }
 /* /////////////////////////////////////////// radio */
 .custom-radio {

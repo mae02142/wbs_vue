@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import { gantt } from "dhtmlx-gantt";
 export default createStore({
   state: {
     projectList: [],
@@ -54,7 +55,12 @@ export default createStore({
       }
     },
     deleteProject(state, project_num) {
+      // 삭제하려는 프로젝트가 현재 선택된 프로젝트인지 확인
+      if(state.selectedProject.project_num === project_num) {
+      state.selectedProject = {};
+      }
       state.projectList = state.projectList.filter(p => p.project_num !== project_num);
+      gantt.clearAll();
     }
   },
   actions: {

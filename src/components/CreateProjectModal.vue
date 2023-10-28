@@ -19,7 +19,7 @@
                     </select>
                 </div>
                 <div class="status-detail">
-                    <div class="s-header"> 
+                    <div class="s-header">
                         <span>세부정보</span>
                     </div>
 
@@ -77,7 +77,7 @@
       visible: {
         type: Boolean,
         default: false
-      },
+      }
     },
     data() {
       return {

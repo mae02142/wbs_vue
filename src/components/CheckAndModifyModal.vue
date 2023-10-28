@@ -92,7 +92,7 @@
   import MemberSearchModal from "./MemberSearchModal.vue";
   import axios from "axios";
   import mixin from "../mixin";
-  
+
 
   export default {
     name:"CheckAndModifyModal",
