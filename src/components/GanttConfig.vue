@@ -76,10 +76,7 @@ export default {
       selectedScale: "day",
       updatingTask: false,
       tasks: { data: [] },
-<<<<<<< HEAD
-=======
-      members:[]
->>>>>>> projectManagement
+      members: [],
     };
   },
   watch: {
@@ -208,39 +205,37 @@ export default {
         }
       },
       handleTaskUpdated(){
-      this.renderGanttChart(this.todoList);
-    },
-    renderGanttChart(newTodoList) {
-      gantt.clearAll();
-        const transformedTasks = newTodoList.map(task => ({
-          id: task.todo_num,
-          text: task.todo_title,
-          start_date: this.$store.getters.formatDate(task.start_date),
-          end_date: this.$store.getters.formatDate(task.due_date),
-          member: task.member_name,
-          status: task.status,
-          content: task.content,
-          project_manager : this.project.project_manager
+        this.renderGanttChart(this.todoList);
+      },
+      renderGanttChart(newTodoList) {
+        gantt.clearAll();
+          const transformedTasks = newTodoList.map(task => ({
+            id: task.todo_num,
+            text: task.todo_title,
+            start_date: this.$store.getters.formatDate(task.start_date),
+            end_date: this.$store.getters.formatDate(task.due_date),
+            member: task.member_name,
+            status: task.status,
+            content: task.content,
+            project_manager : this.project.project_manager
+          }));
+          this.tasks = { data: transformedTasks };
+          gantt.parse(this.tasks);
+      },
+
+      triggerToast(param){ // 알림창
+        this.eventBus.emit('toast-event', param);
+      },
+
+      updateMembersOptions(project_num) {
+        console.log("project_num",project_num);
+        const members = this.$store.state.projectMembers;
+        this.membersOptions = members.map(member => ({
+          key: member.member_num,
+          label: member.member_name
         }));
-        this.tasks = { data: transformedTasks };
-        gantt.parse(this.tasks);
-    },
-<<<<<<< HEAD
-    triggerToast(param){ // 알림창
-      this.eventBus.emit('toast-event', param);
-    }
-=======
-    updateMembersOptions(project_num) {
-    console.log("project_num",project_num);
-    const members = this.$store.state.projectMembers;
-    this.membersOptions = members.map(member => ({
-      key: member.member_num,
-      label: member.member_name
-    }));
-    console.log("멤버들...",members);
-  },
-  
->>>>>>> projectManagement
+        console.log("멤버들...",members);
+      },
     },
 
     mounted() {

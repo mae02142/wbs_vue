@@ -28,7 +28,6 @@
         </div>
         </div>
       </div>
-       
 </template>
 
 <script>
@@ -39,13 +38,8 @@ import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
 import { mapState } from "vuex";
-<<<<<<< HEAD
 import {useToast} from "vue-toastification";
 import "vue-toastification/dist/index.css";
-=======
-import { inject } from 'vue';
-
->>>>>>> projectManagement
 
 export default {
   components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal },
@@ -77,24 +71,18 @@ export default {
       immediate: true,
     }
   },
-<<<<<<< HEAD
   mounted(){
     this.eventBus.on('toast-event', (param) => {
       this.showToast(param);
     })
   },
-=======
-  setup() {
-    const eventBus = inject('useMitt');
-
+  setup2() {
     const moveCreateProject = () => {
-      eventBus.emit('moveCreateProject');
+      this.eventBus.emit('moveCreateProject');
     };
-
     return { moveCreateProject };
   },
 
->>>>>>> projectManagement
   methods: {
     // type 1 : info
     // type 2 : error
@@ -157,7 +145,6 @@ export default {
       }
     },
   
-<<<<<<< HEAD
     viewCalendar() {
       if (this.selectedProject && this.selectedProject.project_num) {
         this.isCalendar = true;
@@ -166,24 +153,14 @@ export default {
         this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
       }
     },
-=======
-  viewCalendar() {
-    if (this.selectedProject && this.selectedProject.project_num) {
-      this.isCalendar = true;
-      this.isTimeLine = false;
-    } else {
-      alert('먼저 프로젝트를 선택해주세요.');
-    }
-  },
-  
-  viewAll() {
-    if (this.selectedProject && this.selectedProject.project_num) {
-      this.isHide = true;
-    } else {
-      alert('먼저 프로젝트를 선택해주세요.');
-    }
-  },
->>>>>>> projectManagement
+
+    viewAll() {
+      if (this.selectedProject && this.selectedProject.project_num) {
+        this.isHide = true;
+      } else {
+        this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
+      }
+    },
     openProjectSettingModal(){
       if (this.selectedProject && this.selectedProject.project_num) {
       this.showProjectSettingModal=true;

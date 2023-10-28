@@ -31,11 +31,11 @@ import CreateProjectModal from "./CreateProjectModal.vue";
 import axios from "axios";
 import mixin from "../mixin";
 import { mapState } from "vuex";
-import { inject} from 'vue';
 
 export default {
   name: 'SideBar',
   mixins:[mixin],
+  inject: ["eventBus"],
   components:{CreateProjectModal},
   data() {
     return {
@@ -44,10 +44,6 @@ export default {
       showProjects: false,
       activeProjectIndex: -1,
     };
-  },
-  setup() {
-    const eventBus = inject('useMitt');
-    return { eventBus };
   },
   mounted(){
     this.eventBus.on('moveCreateProject', this.openModal);
@@ -83,7 +79,6 @@ export default {
     async getProjectList(){
       try {
         const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
-<<<<<<< HEAD
         var dataList = response.data;
         var today = new Date();
         dataList.forEach(element => {
@@ -102,12 +97,6 @@ export default {
           console.log("element >>>>>>> ", element.status)
         });
         this.$store.dispatch('updateProjectsData', dataList);
-=======
-        this.$store.dispatch('updateProjectsData', response.data);
-        // const memberlist = response.data.project.member_list;
-        // console.log("프로젝트 리스트",memberlist);
-        console.log("프로젝트",response.data);
->>>>>>> projectManagement
       } catch (error) {
         console.log("Failed to Get Project List >>>>", error);
       }

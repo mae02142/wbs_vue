@@ -175,13 +175,7 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
-<<<<<<< HEAD
-        // window.ws.send(
-        //   this.members +","
-        //   + this.project_num +","
-        //   +this.project_title
-        // );
-=======
+
         // 멤버 정보를 Vuex 스토어에 직접 저장
         const project = response.data;
         this.$store.commit('setSelectedProject', project);
@@ -190,7 +184,7 @@
         //     +response.data.project_num +","
         //     +response.data.project_title
         //   );
->>>>>>> projectManagement
+        
         this.setClearData();
         this.$emit('close');
       } catch (error) {
