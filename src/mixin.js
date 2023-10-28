@@ -3,7 +3,11 @@
 export default {
     data() {
       return {
+<<<<<<< HEAD
         key: '0a67404f-045f-41c1-bbfb-1a84e402ee31',
+=======
+        key: '09e5427c-7287-4c1f-9dae-95e7daebbd7c',
+>>>>>>> projectManagement
       };
     },
     mounted() {

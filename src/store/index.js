@@ -4,7 +4,8 @@ export default createStore({
   state: {
     projectList: [],
     selectedProject: {},
-    loginMember: {}
+    loginMember: {},
+    projectMembers: [],
   },
   getters: {
     formatDate: () => (dateString) => {
@@ -21,7 +22,8 @@ export default createStore({
     parseDate: () => (string) => {
       return new Date(string);
     },
-    selectedProject: (state) => state.selectedProject
+    selectedProject: (state) => state.selectedProject,
+
   },
   mutations: {
     setProjectList(state, projects) {
@@ -44,6 +46,7 @@ export default createStore({
         project.due_date = this.getters.formatDate(project.due_date);
       }
       state.selectedProject = project;
+      state.projectMembers = [...project.member_list];
     },
     setLoginMember(state, member) {
       state.loginMember = member;
@@ -61,7 +64,7 @@ export default createStore({
       }
       state.projectList = state.projectList.filter(p => p.project_num !== project_num);
       gantt.clearAll();
-    }
+    },
   },
   actions: {
     updateProjectsData({ commit }, projects) {

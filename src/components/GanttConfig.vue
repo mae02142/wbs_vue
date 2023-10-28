@@ -61,6 +61,7 @@
 import { gantt } from "dhtmlx-gantt";
 import axios from "axios";
 import mixin from "../mixin";
+import { mapState } from "vuex";
 
 export default {
   name: "GanttConfig",
@@ -75,6 +76,10 @@ export default {
       selectedScale: "day",
       updatingTask: false,
       tasks: { data: [] },
+<<<<<<< HEAD
+=======
+      members:[]
+>>>>>>> projectManagement
     };
   },
   watch: {
@@ -104,10 +109,24 @@ export default {
         }
       },
       immediate: true
-    }
+    },
+    selectedProject: {
+      handler(newProject) {
+      if (newProject && newProject.project_num) {
+        this.updateMembersOptions(newProject.project_num);
+      }
+    },
+    deep: true,
+    immediate: true
+  }
+  }, 
+  computed: {
+    ...mapState(['selectedProject']),
   },
+  
+  /* eslint-disable */
   methods: {
-      //selectedScale
+    //selectedScale
     setDayScale() {
       gantt.config.scale_unit = "day";
       gantt.config.date_scale = "%d %M";
@@ -206,9 +225,22 @@ export default {
         this.tasks = { data: transformedTasks };
         gantt.parse(this.tasks);
     },
+<<<<<<< HEAD
     triggerToast(param){ // 알림창
       this.eventBus.emit('toast-event', param);
     }
+=======
+    updateMembersOptions(project_num) {
+    console.log("project_num",project_num);
+    const members = this.$store.state.projectMembers;
+    this.membersOptions = members.map(member => ({
+      key: member.member_num,
+      label: member.member_name
+    }));
+    console.log("멤버들...",members);
+  },
+  
+>>>>>>> projectManagement
     },
 
     mounted() {
@@ -236,16 +268,16 @@ export default {
           ).substr(0, 70)
         );
       };
-
+      
       //todo 추가 모달창 - 구성
       gantt.config.lightbox.sections = [
         { name: "description", height: 38, map_to: "text", type: "textarea"},
         { name: "content", height: 38, map_to: "content", type: "textarea" },
         { name: "project_manager", height: 16, type: "template", map_to: "project_manager"},
-        { name: "member", height: 60, type: "template", map_to: "member"},
+        { name: "member", height: 60, map_to: "member", type: "multiselect", options:this.membersOptions},
         { name: "priority", height: 22, map_to: "status", type: "select",
           options: [
-            { key: "todo", label: "해야 할 일" },
+            { key: "todo", label: "예정" },
             { key: "ongoing", label: "진행 중" },
             { key: "done", label: "완료됨" },
           ],
@@ -272,7 +304,6 @@ export default {
       };
 
       gantt.attachEvent("onTaskLoading", function(task) {
-        console.log(task);
         if (task.end_date) {
           task.end_date.setHours(23, 59, 59);
         }
@@ -339,6 +370,58 @@ export default {
       gantt.config.duration_step = 1;
       gantt.config.duration_unit = "day";
       gantt.config.min_duration = 24 * 60 * 60 * 1000;
+      
+      //pm -> member 할일 할당
+      gantt.form_blocks["multiselect"] = {
+      render: function (sns) {
+        var height = (sns.height || "23") + "px";
+        var html = "<div class='gantt_cal_ltext gantt_cal_chosen gantt_cal_multiselect' style='height:"
+        + height + ";'><select data-placeholder='...' class='chosen-select' multiple>";
+        if (sns.options) {
+        for (var i = 0; i < sns.options.length; i++) {
+          if(sns.unassigned_value !== undefined && sns.options[i].key==sns.unassigned_value){
+              continue;
+          }
+          html+="<option value='" +sns.options[i].key+ "'>"+sns.options[i].label+"</option>";
+        }
+      }
+        html += "</select></div>";
+        return html;
+      },
+      
+      set_value: function (node, value, ev, sns) {
+          node.style.overflow = "visible";
+          node.parentNode.style.overflow = "visible";
+          node.style.display = "inline-block";
+          var select = $(node.firstChild);
+      
+          if (value) {
+          value = Array.isArray(value) ? value : (value + "").split(",");
+          select.val(value);
+        } else {
+          select.val([]);
+        }
+      
+          select.chosen();
+          if(sns.onchange){
+              select.change(function(){
+                  sns.onchange.call(this);
+              })
+          }
+          select.trigger('chosen:updated');
+          select.trigger("change");
+      },
+      
+      get_value: function (node, ev) {
+          var value = $(node.firstChild).val();
+          //value = value ? value.join(",") : null
+          return value;
+      },
+      
+      focus: function (node) {
+          $(node.firstChild).focus();
+      }
+      };
 
       //초기화
       gantt.init(this.$refs.gantt);
@@ -359,6 +442,20 @@ export default {
 .hide-add-button .gantt_grid_scale .gantt_grid_head_add {
     display: none;
 }
+
+.chosen-container .chosen-drop{
+  min-width: 200px;
+}
+
+.chosen-container-multi .chosen-choices{
+  min-width: 432px;
+  border: 1px solid #cecece7a;
+  font-size: 12px;
+  color: #726666;
+  font-family: Arial;
+  border-radius: 26px;
+}
+
 /* /////////////////////////////////////////// radio */
 .custom-radio {
     font-size: 11px;

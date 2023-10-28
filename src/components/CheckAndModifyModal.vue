@@ -126,7 +126,7 @@
         //프로젝트 진행 상태
         selectedStatus: 'todo',  // 기본값을 'all'로 설정
         statusOptions: [
-        { value: 'todo', text: '해야 할 일' },
+        { value: 'todo', text: '예정' },
         { value: 'ongoing', text: '진행중' },
         { value: 'done', text: '완료' },
         ],

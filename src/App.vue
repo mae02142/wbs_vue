@@ -1,7 +1,12 @@
 <template>
   <div class="tl-container">
-      <SideBar @projectSelected="getTodoList"></SideBar>
-        <div class="tab">
+        <SideBar @projectSelected="getTodoList" @createProjectClicked="handleCreateProject"></SideBar>
+        <div v-if="!selectedProject || !selectedProject.project_num" class="pm-notice">
+          프로젝트를 생성하거나 선택해주세요.<br>
+          ...프로젝트 추가하기<img class="project-img" src="./assets/icon/icon-plus.png" @click="moveCreateProject">
+        </div>
+        <div v-show="selectedProject && selectedProject.project_num">
+          <div class="tab">
             <button class="tab-btn1" @click="viewTimeline()">Time Line</button>
             <button class="tab-btn2" @click="viewCalendar()">Calendar</button>
             <span class="tab-detail-btn" @click="openProjectSettingModal">상세보기</span>
@@ -21,7 +26,9 @@
               </FullCalendar>
             </div>
         </div>
-  </div>
+        </div>
+      </div>
+       
 </template>
 
 <script>
@@ -32,8 +39,13 @@ import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
 import { mapState } from "vuex";
+<<<<<<< HEAD
 import {useToast} from "vue-toastification";
 import "vue-toastification/dist/index.css";
+=======
+import { inject } from 'vue';
+
+>>>>>>> projectManagement
 
 export default {
   components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal },
@@ -65,11 +77,24 @@ export default {
       immediate: true,
     }
   },
+<<<<<<< HEAD
   mounted(){
     this.eventBus.on('toast-event', (param) => {
       this.showToast(param);
     })
   },
+=======
+  setup() {
+    const eventBus = inject('useMitt');
+
+    const moveCreateProject = () => {
+      eventBus.emit('moveCreateProject');
+    };
+
+    return { moveCreateProject };
+  },
+
+>>>>>>> projectManagement
   methods: {
     // type 1 : info
     // type 2 : error
@@ -119,7 +144,6 @@ export default {
           t_key: this.key,
         });
         this.todoList = response.data;
-        console.log("캘린더로 보낼!!", this.todoList);
       } catch (error) {
         console.error("Failed to Get Todo List", error);
       }
@@ -133,6 +157,7 @@ export default {
       }
     },
   
+<<<<<<< HEAD
     viewCalendar() {
       if (this.selectedProject && this.selectedProject.project_num) {
         this.isCalendar = true;
@@ -141,6 +166,24 @@ export default {
         this.showToast({'type':2,'text':'프로젝트를 선택하세요'})
       }
     },
+=======
+  viewCalendar() {
+    if (this.selectedProject && this.selectedProject.project_num) {
+      this.isCalendar = true;
+      this.isTimeLine = false;
+    } else {
+      alert('먼저 프로젝트를 선택해주세요.');
+    }
+  },
+  
+  viewAll() {
+    if (this.selectedProject && this.selectedProject.project_num) {
+      this.isHide = true;
+    } else {
+      alert('먼저 프로젝트를 선택해주세요.');
+    }
+  },
+>>>>>>> projectManagement
     openProjectSettingModal(){
       if (this.selectedProject && this.selectedProject.project_num) {
       this.showProjectSettingModal=true;
@@ -221,4 +264,14 @@ export default {
   color: #090c0787;
 }
 
+.pm-notice{
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 </style>

@@ -92,7 +92,7 @@
         hasSelectedMembers: false,
         selectedStatus: 'todo',
         statusOptions: [
-        { value: 'todo', text: '해야 할 일' },
+        { value: 'todo', text: '예정' },
         { value: 'ongoing', text: '진행중' },
         { value: 'done', text: '완료' },
       ],
@@ -175,11 +175,22 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
+<<<<<<< HEAD
         // window.ws.send(
         //   this.members +","
         //   + this.project_num +","
         //   +this.project_title
         // );
+=======
+        // 멤버 정보를 Vuex 스토어에 직접 저장
+        const project = response.data;
+        this.$store.commit('setSelectedProject', project);
+        // window.ws.send(
+        //     members +","
+        //     +response.data.project_num +","
+        //     +response.data.project_title
+        //   );
+>>>>>>> projectManagement
         this.setClearData();
         this.$emit('close');
       } catch (error) {
