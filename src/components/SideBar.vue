@@ -2,19 +2,19 @@
   <aside>
     <nav id="sideBar">
         <div class="create-project">
-          <span><img src="../assets/icon/icon-row.png" style="width:12px; height:12px;">&nbsp;&nbsp;전체 프로젝트&nbsp;</span>
+          <span><img src="../assets/icon/icon-slash.png" style="width:7px; height:12px;">&nbsp;&nbsp;프로젝트 추가&nbsp;</span>
             <img class="project-img" src="../assets/icon/icon-plus.png" @click="openModal">
             <CreateProjectModal :visible="showModal" @close="closeModal" @projectCreated="handleProjectCreated"
             :projectData="selectedProject"></CreateProjectModal>
         </div>
           <div>
             <div class="project-list">
-              <span><img src="../assets/icon/icon-row.png" style="width:12px; height:12px;">&nbsp;&nbsp;목록 보기&nbsp;</span>
-              <img v-if="!showProjects" @click="toggleProjects" class="down-img" src="../assets/icon/icon-down.png">
+              <span><img src="../assets/icon/icon-slash.png" style="width:7px; height:12px;">&nbsp;&nbsp;목록 보기&nbsp;</span>
+              <img v-if="showProjects" @click="toggleProjects" class="down-img" src="../assets/icon/icon-down.png">
               <img v-else @click="toggleProjects" class="down-img" src="../assets/icon/icon-up.png">
             </div>
             <div>
-              <ul v-if="showProjects">                                                                                                   
+              <ul v-if="!showProjects">                                                                                                   
                 <li v-for="(project, index) in projectList" :key="project.project_num">
                 <span class="project-title" @click="selectProject(project, index)" :class="{ 'active': activeProjectIndex === index }">
                 {{ project.project_title }}</span>
@@ -31,6 +31,7 @@ import CreateProjectModal from "./CreateProjectModal.vue";
 import axios from "axios";
 import mixin from "../mixin";
 import { mapState } from "vuex";
+import { inject} from 'vue';
 
 export default {
   name: 'SideBar',
@@ -44,8 +45,16 @@ export default {
       activeProjectIndex: -1,
     };
   },
+  setup() {
+    const eventBus = inject('useMitt');
+    return { eventBus };
+  },
   mounted(){
+    this.eventBus.on('moveCreateProject', this.openModal);
     this.getProjectList();
+  },
+  beforeUnmount() {
+    this.eventBus.off('moveCreateProject', this.openModal);
   },
   computed:{
     ...mapState(['projectList', 'selectedProject']),
@@ -75,12 +84,16 @@ export default {
       try {
         const response = await axios.get("http://localhost:8030/api/projectList?t_key="+this.key);
         this.$store.dispatch('updateProjectsData', response.data);
+        // const memberlist = response.data.project.member_list;
+        // console.log("프로젝트 리스트",memberlist);
+        console.log("프로젝트",response.data);
       } catch (error) {
         console.log("Failed to Get Project List >>>>", error);
       }
     },
     selectProject(project, index) {
     if (this.selectedProject.project_num !== project.project_num) {
+      
       this.$store.commit('setSelectedProject', project);
     }
     this.updateActiveProjectIndex(index);

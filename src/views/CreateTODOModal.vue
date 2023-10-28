@@ -18,7 +18,7 @@
             <div class="m-right">
                 <div class="status">
                     <select>
-                        <option>해야 할 일</option>
+                        <option>예정</option>
                         <option>진행중</option>
                         <option>완료됨</option>
                     </select>
