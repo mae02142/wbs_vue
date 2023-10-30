@@ -170,8 +170,8 @@
             members:members
         });
         this.$emit('projectCreated', response.data);
-        // 멤버 정보를 Vuex 스토어에 직접 저장
         const project = response.data;
+        response.data.member_list=this.selectedMembers;
         this.$store.commit('setSelectedProject', project);
         // window.ws.send(
         //     members +","
