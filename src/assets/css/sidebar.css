@@ -71,3 +71,10 @@
 .project-title:hover{
     cursor: pointer;
 }
+
+.project-status {
+    float: right;
+    padding-right: 7px;
+    border: 1px solid;
+    border-radius: 15px;
+}

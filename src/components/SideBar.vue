@@ -16,8 +16,13 @@
             <div>
               <ul v-if="!showProjects">                                                                                                   
                 <li v-for="(project, index) in projectList" :key="project.project_num">
-                <span class="project-title" @click="selectProject(project, index)" :class="{ 'active': activeProjectIndex === index }">
-                {{ project.project_title }}</span>
+                <span class="project-title" @click="selectProject(project, index)" 
+                :class="{ 'active': activeProjectIndex === index }">
+                {{ project.project_title }}
+                  <span class="project-status"
+                  :style="{ 'color': project.status === 'done' ? 'red' : (project.status === 'todo' ? 'purple' : 'green') }"
+                  >{{ project.status }}</span>
+                </span>
               </li>
               </ul>
             </div>
@@ -90,11 +95,16 @@ export default {
           endDate.setHours(0, 0, 0, 0);
           endDate.setDate(endDate.getDate() + 1);
 
-          if (today > endDate) element.status = 'done'
-          else if (today < startDate) element.status = 'todo'
-          else element.status = 'ongoing'
-
-          console.log("element >>>>>>> ", element.status)
+          if (today > endDate) {
+            element.status = 'done'
+          }
+          else if (today < startDate) {
+            element.status = 'todo'
+          }
+          else {
+            element.status = 'ongoing'
+          }
+          console.log(element.project_title, " status : ", this.activeStatus)
         });
         this.$store.dispatch('updateProjectsData', dataList);
       } catch (error) {
@@ -105,13 +115,13 @@ export default {
     if (this.selectedProject.project_num !== project.project_num) {
       
       this.$store.commit('setSelectedProject', project);
-    }
-    this.updateActiveProjectIndex(index);
-  },
-  
-  updateActiveProjectIndex(index) {
-    this.activeProjectIndex = this.activeProjectIndex === index ? -1 : index;
-  },
+      }
+      this.updateActiveProjectIndex(index);
+    },
+    
+    updateActiveProjectIndex(index) {
+      this.activeProjectIndex = this.activeProjectIndex === index ? -1 : index;
+    },
   }
 }
 </script>
