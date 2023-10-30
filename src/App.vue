@@ -37,18 +37,15 @@ import FullCalendar from "./components/FullCalendar.vue";
 import CheckAndModifyModal from "./components/CheckAndModifyModal.vue";
 import axios from "axios";
 import mixin from "./mixin";
-import { mapState } from "vuex";
-import {useToast} from "vue-toastification";
 import "vue-toastification/dist/index.css";
+import { inject } from 'vue';
+import { mapState } from 'vuex';
+import { useToast } from 'vue-toastification';
 
 export default {
   components: { SideBar, GanttConfig, FullCalendar, CheckAndModifyModal },
   mixins:[mixin],
   inject: ["eventBus"],
-  setup() {
-    const toast = useToast();
-    return { toast }
-  },
   data() {
     return {
       todoList: [],
@@ -76,11 +73,14 @@ export default {
       this.showToast(param);
     })
   },
-  setup2() {
+  setup() {
+    const toast = useToast();
+    const eventBus = inject('eventBus');
+
     const moveCreateProject = () => {
-      this.eventBus.emit('moveCreateProject');
+      eventBus.emit('moveCreateProject');
     };
-    return { moveCreateProject };
+    return { toast, moveCreateProject };
   },
 
   methods: {
