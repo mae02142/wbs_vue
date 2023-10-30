@@ -110,7 +110,6 @@ export default {
     selectedProject: {
       handler(newProject) {
       if (newProject && newProject.project_num) {
-        //console.log("selectedProject 변경됨", newProject);
         this.updateMembersOptions(newProject);
       }
     },
@@ -213,14 +212,15 @@ export default {
       renderGanttChart(newTodoList) {
         gantt.clearAll();
           const transformedTasks = newTodoList.map(task => ({
-            id: task.todo_num,
-            text: task.todo_title,
-            start_date: this.$store.getters.formatDate(task.start_date),
-            end_date: this.$store.getters.formatDate(task.due_date),
-            member: task.member_name,
-            status: task.status,
-            content: task.content,
-            project_manager : this.project.project_manager
+          id: task.todo_num,
+          text: task.todo_title,
+          start_date: this.$store.getters.formatDate(task.start_date),
+          end_date: this.$store.getters.formatDate(task.due_date),
+          member_num: task.member_num,
+          member: task.member_name,
+          status: task.status,
+          content: task.content,
+          project_manager : this.project.project_manager
           }));
           this.tasks = { data: transformedTasks };
           gantt.parse(this.tasks);
@@ -230,15 +230,31 @@ export default {
         this.eventBus.emit('toast-event', param);
       },
 
-      updateMembersOptions(project_num) {
-        console.log("project_num",project_num);
-        const members = this.$store.state.projectMembers;
-        this.membersOptions = members.map(member => ({
-          key: member.member_num,
-          label: member.member_name
-        }));
-        console.log("멤버들...",members);
+      updateMembersOptions(project) {
+      const memberList = project.member_list;
+      this.members =(memberList || []).map(member => ({
+      key: member.member_num,
+      label: member.member_name
+    }));
       },
+      updateLightboxSections() {
+        gantt.config.lightbox.sections = [
+          { name: "description", height: 38, map_to: "text", type: "textarea"},
+          { name: "content", height: 38, map_to: "content", type: "textarea" },
+          { name: "project_manager", height: 16, type: "template", map_to: "project_manager"},
+          { name: "member", height: 60, map_to: "member", type: "multiselect", options:this.members},
+          { name: "priority", height: 22, map_to: "status", type: "select",
+            options: [
+              { key: "todo", label: "예정" },
+              { key: "ongoing", label: "진행 중" },
+              { key: "done", label: "완료됨" },
+            ],
+          },
+          { name: "period", height: 72, type: "time", time_format: ["%Y", "%m", "%d"],
+            map_to:{start_date:"start_date",end_date:"end_date"}},
+        ];
+          gantt.resetLightbox();
+       }
     },
 
     mounted() {
@@ -279,7 +295,6 @@ export default {
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
         task.member = this.members;
-        //console.log(this.members);
         task.text='';
         return true;
       });
@@ -309,7 +324,6 @@ export default {
           this.triggerToast({'type':4,'text':'할 일을 선택해주세요'})
           return false; // 저장 취소
         }
-        console.log("흠....",task);
         const sendtask = {
           todo_num: id,
           todo_title: task.text,
@@ -367,8 +381,8 @@ export default {
       gantt.config.min_duration = 24 * 60 * 60 * 1000;
       
       //가시성을 위한 스케일바 설정
-        gantt.templates.task_class = (start, end, task) => {
-          console.log("login",task.member_num);
+      gantt.templates.task_class = (start, end, task) => {
+          console.log("login",task);
           console.log("this.loginMember.member_num",this.loginMember.member_num);
           if (task.member_num && task.member_num !== this.loginMember.member_num) {
             return 'different-member';
