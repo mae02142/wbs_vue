@@ -93,7 +93,7 @@
         selectedStatus: 'todo',
         statusOptions: [
         { value: 'todo', text: '예정' },
-        { value: 'ongoing', text: '진행중' },
+        { value: 'ing', text: '진행중' },
         { value: 'done', text: '완료' },
       ],
       };

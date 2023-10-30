@@ -248,7 +248,7 @@ export default {
           { name: "priority", height: 22, map_to: "status", type: "select",
             options: [
               { key: "todo", label: "예정" },
-              { key: "ongoing", label: "진행 중" },
+              { key: "ing", label: "진행 중" },
               { key: "done", label: "완료됨" },
             ],
           },
@@ -483,7 +483,25 @@ get_value: function (node, ev, sns) {
   min-width: 200px;
 }
 
-.chosen-container-single .chosen-drop{
+.chosen-container-single .chosen-single {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding: 1px 0 4px 10px !important;
+    height: 26px !important;
+    width: 117px !important;
+    border: 1px solid #aaaaaa52 !important;
+    border-radius: 20px !important;
+    background: white!important;
+    background-clip: padding-box;
+    color: #1d1a1a !important;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 24px;
+    font-size: 11px !important;
+}   
+
+.single .chosen-drop{
   width: 200px;
   font-size: 12px;
   color: #726666;
@@ -493,6 +511,49 @@ get_value: function (node, ev, sns) {
 .chosen-single{
   width: 200px;
 }
+
+.chosen-container-single .chosen-search input[type=text] {
+    margin: 3px 1px !important;
+    padding: 4px 20px 4px 9px !important;
+    width: 97% !important;
+    height: auto;
+    outline: 0;
+    border: 1px solid #aaaaaa61 !important;
+    font-size: 12px !important;
+    font-family: sans-serif;
+    line-height: normal;
+    border-radius: 17px !important;
+}
+
+.chosen-container .chosen-results li {
+    display: none;
+    margin: 0;
+    padding: 6px 8px !important;
+    list-style: none;
+    line-height: 15px;
+    word-wrap: break-word;
+    font-size: 11px!important;
+    -webkit-touch-callout: none;
+}
+
+.chosen-container.chosen-with-drop .chosen-drop {
+    clip: auto;
+    -webkit-clip-path: none;
+    clip-path: none;
+    width: 100px !important;
+    margin-left: 8px !important;
+    margin-top: 0px !important;
+    border-radius: 13px !important;
+    border: 1px solid #8080803d !important;
+}
+
+.chosen-container .chosen-results li.highlighted {
+    background-color: #5ba94b21;
+    background-image: none !important;
+    background-image: none !important;
+    color: #120f0f;
+}
+
 
 .different-member {
   background-color: rgb(174, 219, 159) !important;/* 원하는 색상 코드로 변경 */
@@ -780,8 +841,8 @@ div[role="button"][aria-label="저장"] {
    margin-left: 123px !important;
 }
 
-.gantt_cal_light .gantt_btn_set {  /* btn 간격 */
-    margin: -14px 19px;
+.gantt_cal_light .gantt_btn_set {
+    margin: 7px 19px;
 }
 
 .gantt_btn_set {

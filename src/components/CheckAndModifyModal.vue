@@ -127,7 +127,7 @@
         selectedStatus: 'todo',  // 기본값을 'all'로 설정
         statusOptions: [
         { value: 'todo', text: '예정' },
-        { value: 'ongoing', text: '진행중' },
+        { value: 'ing', text: '진행중' },
         { value: 'done', text: '완료' },
         ],
       };
