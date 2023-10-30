@@ -104,7 +104,7 @@ export default {
           else {
             element.status = 'ongoing'
           }
-          console.log(element.project_title, " status : ", this.activeStatus)
+          // console.log(element.project_title, " status : ", this.activeStatus);
         });
         this.$store.dispatch('updateProjectsData', dataList);
       } catch (error) {

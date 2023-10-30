@@ -178,6 +178,7 @@
         // 멤버 정보를 Vuex 스토어에 직접 저장
         const project = response.data;
         response.data.member_list=this.selectedMembers;
+        project.member_list.push(this.$store.state.loginMember);
         this.$store.commit('setSelectedProject', project);
         // window.ws.send(
         //     members +","

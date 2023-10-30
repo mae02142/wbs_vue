@@ -231,11 +231,13 @@ export default {
       },
 
       updateMembersOptions(project) {
-      const memberList = project.member_list;
-      this.members =(memberList || []).map(member => ({
-      key: member.member_num,
-      label: member.member_name
-    }));
+        console.log("프로젝트>>>",project);
+        const memberList = project.member_list;
+        this.members =(memberList || []).map(member => ({
+          key: member.member_num,
+          label: member.member_name
+        }));
+        console.log("프로젝트멤버>>>",this.members);
       },
       updateLightboxSections() {
         gantt.config.lightbox.sections = [
@@ -382,8 +384,6 @@ export default {
       
       //가시성을 위한 스케일바 설정
       gantt.templates.task_class = (start, end, task) => {
-          console.log("login",task);
-          console.log("this.loginMember.member_num",this.loginMember.member_num);
           if (task.member_num && task.member_num !== this.loginMember.member_num) {
             return 'different-member';
           }
@@ -410,6 +410,7 @@ export default {
       },
 
       set_value: function (node, value, ev, sns) {
+        console.log(value);
   // node 및 관련 스타일 설정
   node.style.overflow = "visible";
   node.parentNode.style.overflow = "visible";

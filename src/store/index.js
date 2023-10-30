@@ -45,6 +45,7 @@ export default createStore({
       if (project.due_date) {
         project.due_date = this.getters.formatDate(project.due_date);
       }
+      console.log(project.member_list);
       state.selectedProject = project;
       state.projectMembers = [...project.member_list];
     },
