@@ -110,15 +110,19 @@ export default {
     selectedProject: {
       handler(newProject) {
       if (newProject && newProject.project_num) {
-        this.updateMembersOptions(newProject.project_num);
+        //console.log("selectedProject 변경됨", newProject);
+        this.updateMembersOptions(newProject);
       }
     },
     deep: true,
     immediate: true
-  }
+  },
+  members() {
+    this.updateLightboxSections();
+  },
   }, 
   computed: {
-    ...mapState(['selectedProject']),
+    ...mapState(['selectedProject', 'loginMember']),
   },
   
   /* eslint-disable */
@@ -167,7 +171,6 @@ export default {
               todoDTO: task,
             }
           );
-          console.log("saveTaskToServer>>",response.data);
           this.handleTaskUpdated();
           this.$emit('task-changed');
         } catch (error) {
@@ -243,7 +246,7 @@ export default {
       gantt.config.date_format = "%Y-%m-%d";
       gantt.config.columns = [
         { name: "text", label: "Title", tree: true, width: 130 },
-        { name: "member", label: "member", align: "center" },
+        { name: "member", label: "member", align: "center"},
         { name: "start_date", label: "Start time", align: "center" },
         { name: "end_date", label: "End time", align: "center" },
         { name: "add", label: ""},
@@ -265,21 +268,7 @@ export default {
       };
       
       //todo 추가 모달창 - 구성
-      gantt.config.lightbox.sections = [
-        { name: "description", height: 38, map_to: "text", type: "textarea"},
-        { name: "content", height: 38, map_to: "content", type: "textarea" },
-        { name: "project_manager", height: 16, type: "template", map_to: "project_manager"},
-        { name: "member", height: 60, map_to: "member", type: "multiselect", options:this.membersOptions},
-        { name: "priority", height: 22, map_to: "status", type: "select",
-          options: [
-            { key: "todo", label: "예정" },
-            { key: "ongoing", label: "진행 중" },
-            { key: "done", label: "완료됨" },
-          ],
-        },
-        { name: "period", height: 72, type: "time", time_format: ["%Y", "%m", "%d"],
-          map_to:{start_date:"start_date",end_date:"end_date"}},
-      ];
+      this.updateLightboxSections();
       gantt.locale.labels.section_description = "할 일";
       gantt.locale.labels.section_content = "세부 설명";
       gantt.locale.labels.section_project_manager = "PM";
@@ -289,10 +278,20 @@ export default {
 
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
-        task.member = this.$store.state.loginMember.member_name;
+        task.member = this.members;
+        //console.log(this.members);
         task.text='';
         return true;
       });
+      // 'title' 열을 비워두기
+      gantt.templates.grid_folder = function(task) {
+        if (task.$level === 0) {
+          return ''; // 최상위 레벨 작업일 경우 비워두기
+        }
+        return task.text;
+      };
+
+
 
       gantt.templates.task_text = function(start,end,task){
       return task.text;  
@@ -310,17 +309,18 @@ export default {
           this.triggerToast({'type':4,'text':'할 일을 선택해주세요'})
           return false; // 저장 취소
         }
-        
+        console.log("흠....",task);
         const sendtask = {
           todo_num: id,
           todo_title: task.text,
           status: task.status,
           start_date: this.$store.getters.formatDate(task.start_date), 
           due_date: this.$store.getters.formatDate(task.end_date),
-          member_name: task.member,
-          member_num: this.$store.state.loginMember.member_num,
+          member_num: task.member.member_num,
+          member_name: task.member.member_name,
           content: task.content
         };
+        console.log("샌드테스크", sendtask);
         //날짜 검사
         const StartedprojectDate = this.project.start_date;
         const EndedprojectDate = this.project.due_date;
@@ -349,8 +349,8 @@ export default {
             status: task.status, 
             start_date: this.$store.getters.formatDate(task.start_date), 
             due_date: this.$store.getters.formatDate(task.end_date),
-            member_name: task.member,
-            member_num: this.$store.state.loginMember.member_num,
+            member_num: task.member.member_num,
+            member_name: task.member.member_name,
             content: task.content
           };
         this.deleteTaskonServer(sendtask);
@@ -366,52 +366,78 @@ export default {
       gantt.config.duration_unit = "day";
       gantt.config.min_duration = 24 * 60 * 60 * 1000;
       
+      //가시성을 위한 스케일바 설정
+        gantt.templates.task_class = (start, end, task) => {
+          console.log("login",task.member_num);
+          console.log("this.loginMember.member_num",this.loginMember.member_num);
+          if (task.member_num && task.member_num !== this.loginMember.member_num) {
+            return 'different-member';
+          }
+          return '';
+        };
+
+
       //pm -> member 할일 할당
       gantt.form_blocks["multiselect"] = {
-      render: function (sns) {
+        render: function (sns) {
         var height = (sns.height || "23") + "px";
-        var html = "<div class='gantt_cal_ltext gantt_cal_chosen gantt_cal_multiselect' style='height:"
-        + height + ";'><select data-placeholder='...' class='chosen-select' multiple>";
+        var html = "<div class='gantt_cal_ltext gantt_cal_chosen gantt_cal_multiselect' style='height:" + height + ";'>" +
+          "<select data-placeholder='...' class='chosen-select'>";
         if (sns.options) {
-        for (var i = 0; i < sns.options.length; i++) {
-          if(sns.unassigned_value !== undefined && sns.options[i].key==sns.unassigned_value){
+          for (var i = 0; i < sns.options.length; i++) {
+            if (sns.unassigned_value !== undefined && sns.options[i].key == sns.unassigned_value) {
               continue;
+            }
+            html += "<option value='" + JSON.stringify({ member_num: sns.options[i].key, member_name: sns.options[i].label }) + "'>" + sns.options[i].label + "</option>";
           }
-          html+="<option value='" +sns.options[i].key+ "'>"+sns.options[i].label+"</option>";
         }
-      }
         html += "</select></div>";
         return html;
       },
-      
+
       set_value: function (node, value, ev, sns) {
-          node.style.overflow = "visible";
-          node.parentNode.style.overflow = "visible";
-          node.style.display = "inline-block";
-          var select = $(node.firstChild);
-      
-          if (value) {
-          value = Array.isArray(value) ? value : (value + "").split(",");
-          select.val(value);
-        } else {
-          select.val([]);
-        }
-      
-          select.chosen();
-          if(sns.onchange){
-              select.change(function(){
-                  sns.onchange.call(this);
-              })
-          }
-          select.trigger('chosen:updated');
-          select.trigger("change");
-      },
-      
-      get_value: function (node, ev) {
-          var value = $(node.firstChild).val();
-          //value = value ? value.join(",") : null
-          return value;
-      },
+  // node 및 관련 스타일 설정
+  node.style.overflow = "visible";
+  node.parentNode.style.overflow = "visible";
+  node.style.display = "inline-block";
+  var select = $(node.firstChild);
+
+  // 단일 객체를 사용하여 선택된 멤버 설정
+  if (value && typeof value === 'object') {
+    var selectedMember = JSON.stringify({member_num: value.member_num, member_name: value.member_name});
+    select.val(selectedMember);
+  }
+
+  // Chosen jQuery 플러그인 초기화
+  select.chosen();
+
+  // 선택 변경 이벤트 핸들러 설정
+  if (sns.onchange) {
+    select.change(function () {
+      sns.onchange.call(this);
+    });
+  }
+
+  // 선택된 상태 업데이트
+  select.trigger('chosen:updated');
+  select.trigger("change");
+},
+
+get_value: function (node, ev, sns) {
+  // 선택된 옵션의 value 값을 가져옵니다.
+  var selectedValue = $(node.firstChild).val();
+  
+  // 선택된 옵션이 없다면 빈 문자열을 반환합니다.
+  if (!selectedValue) {
+    return '';
+  }
+  
+  // 선택된 옵션의 value 값을 JSON 객체로 파싱합니다.
+  var selectedMember = JSON.parse(selectedValue);
+
+  // 선택된 멤버의 정보를 반환합니다.
+  return selectedMember;
+},
       
       focus: function (node) {
           $(node.firstChild).focus();
@@ -438,19 +464,24 @@ export default {
     display: none;
 }
 
-.chosen-container .chosen-drop{
+.chosen-container-multi .chosen-choices{
   min-width: 200px;
 }
 
-.chosen-container-multi .chosen-choices{
-  min-width: 432px;
-  border: 1px solid #cecece7a;
+.chosen-container-single .chosen-drop{
+  width: 200px;
   font-size: 12px;
   color: #726666;
   font-family: Arial;
-  border-radius: 26px;
 }
 
+.chosen-single{
+  width: 200px;
+}
+
+.different-member {
+  background-color: rgb(174, 219, 159) !important;/* 원하는 색상 코드로 변경 */
+}
 /* /////////////////////////////////////////// radio */
 .custom-radio {
     font-size: 11px;

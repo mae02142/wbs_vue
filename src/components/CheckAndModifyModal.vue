@@ -171,23 +171,19 @@
     updateSelectedMembers(updatedMembers) {
       this.selectedMembers = updatedMembers;
       this.hasSelectedMembers = this.selectedMembers.length > 0;
-      console.log("selectedMembers",this.selectedMembers);
     },
 
     showTooltipMethod() {
       this.tooltipVisible = true;
-      console.log("tooltip1");
     },
     moveTooltip(event) {
       if (this.tooltipVisible) {
         this.tooltipStyle.top = event.clientY + 10 + "px"; // 원하는 위치로 조정
         this.tooltipStyle.left = event.clientX + "px";
-        console.log("tooltip2");
       }
     },
     hideTooltip() {
       this.tooltipVisible = false;
-      console.log("tooltip3");
     },
 
 
@@ -243,19 +239,19 @@
           event.preventDefault();
           return;
         }
-    try {
-      // 수정된 내용 서버로 전송
-      const projectDTO = {
-      project_num: this.localProject.project_num,
-      project_title: this.project_title, // 직접 수정된 값 사용
-      status: this.selectedStatus,       // 직접 수정된 값 사용
-      start_date: this.localProject.start_date, // localProject의 값을 사용
-      due_date: this.localProject.due_date,     // localProject의 값을 사용
-      project_manager: this.localProject.project_manager,
-      member_num: this.loginMember.member_num
+        try {
+    const { project_num, start_date, due_date, project_manager } = this.localProject;
+    const { member_num } = this.loginMember;
+    const members = this.selectedMembers.map(member => member.member_num);
+    const projectDTO = {
+      project_num,
+      project_title: this.project_title,
+      status: this.selectedStatus,
+      start_date,
+      due_date,
+      project_manager,
+      member_num
     };
-    console.log("projectDTO>>>>",projectDTO);
-      const members = this.selectedMembers.map(member => member.member_num);
       const response = await axios.post("http://localhost:8030/api/updateProject", {
         t_key: this.key,
         projectDTO: projectDTO,
@@ -263,20 +259,17 @@
       });
       this.triggerToast({'type':3, 'text':'수정이 완료되었습니다.'});
 
-      // 로컬 상태를 업데이트합니다.
-      this.localProject.project_title = this.project_title;
-      this.localProject.start_date = this.start_date;
-      this.localProject.due_date = this.due_date;
-      this.localProject.status = this.selectedStatus;
-      this.localProject.selectedMembers = this.selectedMembers;
-
-      this.$store.dispatch('updateSelectedProject', response.data);
-      this.$store.commit('updateProjectInList', response.data);
-      this.isEditMode = false;
-      this.$emit('close');
-    } catch (error) {
-      console.log(error);
-    }
+    Object.assign(this.localProject, { project_title: this.project_title, status: this.selectedStatus, 
+      selectedMembers: this.selectedMembers });
+    const saveProject = response.data;
+    saveProject.member_list = this.selectedMembers;
+    this.$store.dispatch('updateSelectedProject', saveProject);
+    this.$store.commit('updateProjectInList', saveProject);
+    this.isEditMode = false;
+    this.$emit('close');
+  } catch (error) {
+    console.error(error);
+  }
     },
     confirmDeletion() {
       if (confirm("정말 삭제하시겠습니까?")) {
