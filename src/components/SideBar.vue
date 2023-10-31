@@ -20,7 +20,7 @@
                 :class="{ 'active': activeProjectIndex === index }">
                 {{ project.project_title }}
                   <span class="project-status"
-                  :style="{ 'color': project.status === 'done' ? 'red' : (project.status === 'todo' ? 'purple' : 'green') }"
+                  :style="{ 'color': project.status === 'done' ? '#ff00008f' : (project.status === 'todo' ? '#800080ab' : '#0080008c') }"
                   >{{ project.status }}</span>
                 </span>
               </li>
@@ -102,7 +102,7 @@ export default {
             element.status = 'todo'
           }
           else {
-            element.status = 'ongoing'
+            element.status = 'ing'
           }
           // console.log(element.project_title, " status : ", this.activeStatus);
         });
