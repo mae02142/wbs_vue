@@ -5,6 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import mixin from "../mixin";
+import { mapState } from 'vuex';
 
 
 export default {
@@ -42,7 +43,7 @@ export default {
         weekends: true,
         select: null,
         eventClick: this.handleEventClick,
-        eventsSet: this.setTodoList
+        eventsSet: this.setTodoList,
       },
     }
   },
@@ -55,6 +56,9 @@ export default {
       },
       immediate: true
     }
+  },
+  computed: {
+    ...mapState(['selectedProject']),
   },
   methods: {
     
@@ -71,30 +75,42 @@ export default {
       this.showModal = true;
     },
     async resetCalendar(todos) {
+      var eventColors = null;
+      console.log(eventColors)
+      var memberNum = this.$store.state.selectedProject.member_num;
+      var num = null;
       this.todoListforCal = todos.map((element) => {
-      const startDate = new Date(element.start_date);
-      startDate.setHours(0, 0, 0, 0);
-      startDate.setDate(startDate.getDate() + 1);
+        const startDate = new Date(element.start_date);
+        startDate.setHours(0, 0, 0, 0);
+        startDate.setDate(startDate.getDate() + 1);
 
-      const endDate = new Date(element.due_date);
-      endDate.setHours(0, 0, 0, 0);
-      endDate.setDate(endDate.getDate() + 1);
-
-      return {
-        id: element.todo_num,
-        title: element.todo_title,
-        start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0],
-        member_name: element.member_name,
-        content: element.content,
-        member_num: element.member_num 
-      };
+        const endDate = new Date(element.due_date);
+        endDate.setHours(0, 0, 0, 0);
+        endDate.setDate(endDate.getDate() + 1);
+        num = element.member_num;
+        if (num !== memberNum) {
+          eventColors = '#8fdf82';
+        } else {
+          eventColors = '#7ba16c1a';
+        }
+        return {
+          id: element.todo_num,
+          title: element.todo_title,
+          start: startDate.toISOString().split('T')[0],
+          end: endDate.toISOString().split('T')[0],
+          member_name: element.member_name,
+          content: element.content,
+          member_num: element.member_num,
+          backgroundColor: eventColors,
+        };
       });
 
       await this.$nextTick();
       const calendarApi = this.$refs.cal.getApi();
       calendarApi.removeAllEvents();
-      this.todoListforCal.forEach(event => calendarApi.addEvent(event));
+      this.todoListforCal.forEach(event => {
+        calendarApi.addEvent(event)
+      });
     },
     
   }
