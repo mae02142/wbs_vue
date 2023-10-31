@@ -3,7 +3,7 @@
 export default {
     data() {
       return {
-        key: '0fd06274-51bd-4582-99dd-020e7dae6559',
+        key: '',
       };
     },
     mounted() {
