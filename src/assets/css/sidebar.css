@@ -20,8 +20,8 @@
 #sideBar ul li {
     margin-bottom: 10px !important;
     letter-spacing: -1px;
-    font-size: 12px;
-    color: #635f5fc2;
+    font-size: 13px;
+    color: #635f5fed;
 }
 #sideBar a {
     font-style: normal;  /* 'none' 대신 'normal'을 사용해야 합니다. */
@@ -76,9 +76,10 @@
 .project-status {
     float: none;
     margin-left: 4px;
-    padding: 3px 3px 2px 5px;
+    padding: 2px 3px 2px 5px;
     border: 1px solid;
     border-radius: 20px;
-    font-size: 8px;
-    letter-spacing: 2px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-weight: bolder;
 }

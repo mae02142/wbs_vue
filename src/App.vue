@@ -226,7 +226,7 @@ export default {
     letter-spacing: 2px;
     background: #eaefe705;
     margin-left: 5px;
-    color: #36572887;
+    color: #000000bf;
     font-weight: 600;
 }
 
@@ -247,11 +247,11 @@ export default {
 
 .p-period{
   margin-left: 32px;
-  font-size: 10px;
-  padding: 6px 18px;
-  color: #090c0787;
+  font-size: 11px;
+  padding: 5px 18px;
+  color: #090c07bf;
   letter-spacing: 2px;
-  border: 2px dotted #decece;
+  border: 2px dotted #c9bcbc9c;
   border-radius: 20px;
 }
 #pm-notice-top{

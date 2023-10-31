@@ -188,7 +188,6 @@
 
 
     forTest(temp){
-      console.log("key : " + temp);
       this.key = temp;
       this.participatedMemberList();
     },

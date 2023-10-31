@@ -180,11 +180,11 @@
         response.data.member_list=this.selectedMembers;
         project.member_list.push(this.$store.state.loginMember);
         this.$store.commit('setSelectedProject', project);
-        // window.ws.send(
-        //     members +","
-        //     +response.data.project_num +","
-        //     +response.data.project_title
-        //   );
+        window.ws.send(
+            members +","
+            +response.data.project_num +","
+            +response.data.project_title
+          );
         
         this.setClearData();
         this.$emit('close');

@@ -2,14 +2,14 @@
   <aside>
     <nav id="sideBar">
         <div class="create-project">
-          <span><img src="../assets/icon/icon-slash.png" style="width:7px; height:12px;">&nbsp;&nbsp;프로젝트 추가&nbsp;</span>
+          <span @click="openModal" class="add-project">&nbsp;&nbsp;프로젝트 추가&nbsp;</span>
             <img class="project-img" src="../assets/icon/icon-plus.png" @click="openModal">
             <CreateProjectModal :visible="showModal" @close="closeModal" @projectCreated="handleProjectCreated"
             :projectData="selectedProject"></CreateProjectModal>
         </div>
           <div>
             <div class="project-list">
-              <span><img src="../assets/icon/icon-slash.png" style="width:7px; height:12px;">&nbsp;&nbsp;목록 보기&nbsp;</span>
+              <span>&nbsp;&nbsp;목록 보기&nbsp;</span>
               <img v-if="showProjects" @click="toggleProjects" class="down-img" src="../assets/icon/icon-down.png">
               <img v-else @click="toggleProjects" class="down-img" src="../assets/icon/icon-up.png">
             </div>
@@ -20,7 +20,7 @@
                 :class="{ 'active': activeProjectIndex === index }">
                 {{ project.project_title }}
                   <span class="project-status"
-                  :style="{ 'color': project.status === 'done' ? '#ff00008f' : (project.status === 'todo' ? '#800080ab' : '#0080008c') }"
+                  :style="{ 'color': project.status === 'done' ? '#ff00008f' : (project.status === 'todo' ? '#800080ab' : 'rgb(0 128 0 / 80%)') }"
                   >{{ project.status }}</span>
                 </span>
               </li>
@@ -104,7 +104,6 @@ export default {
           else {
             element.status = 'ing'
           }
-          // console.log(element.project_title, " status : ", this.activeStatus);
         });
         this.$store.dispatch('updateProjectsData', dataList);
       } catch (error) {
@@ -129,4 +128,7 @@ export default {
 <style scoped>
 @import url("../assets/css/sidebar.css");
 
+.add-project{
+  cursor: pointer;
+}
 </style>

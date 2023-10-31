@@ -138,6 +138,7 @@ export default {
       gantt.config.scale_unit = "week";
       gantt.config.date_scale = "%W";
       gantt.config.subscales = [{ unit: "day", step: 1, date: "%d %M" }];
+      gantt.config.column_width = 70;
       gantt.render();
     },
 
@@ -145,6 +146,7 @@ export default {
       gantt.config.scale_unit = "month";
       gantt.config.date_scale = "%F, %Y";
       gantt.config.subscales = [{ unit: "week", format: "Week #%W" }];
+      gantt.config.column_width = 300; // 월 단위에서는 더 넓게
       gantt.render();
     },
     setQuarterScale() {
@@ -157,6 +159,7 @@ export default {
     setYearScale() {
       gantt.config.scale_unit = "year";
       gantt.config.date_scale = "%Y";
+      gantt.config.column_width = 500; // 월 단위에서는 더 넓게
       gantt.render();
     },
       //todo 저장
@@ -231,20 +234,18 @@ export default {
       },
 
       updateMembersOptions(project) {
-        console.log("프로젝트>>>",project);
         const memberList = project.member_list;
         this.members =(memberList || []).map(member => ({
           key: member.member_num,
           label: member.member_name
         }));
-        console.log("프로젝트멤버>>>",this.members);
       },
       updateLightboxSections() {
         gantt.config.lightbox.sections = [
           { name: "description", height: 38, map_to: "text", type: "textarea"},
           { name: "content", height: 38, map_to: "content", type: "textarea" },
           { name: "project_manager", height: 16, type: "template", map_to: "project_manager"},
-          { name: "member", height: 60, map_to: "member", type: "multiselect", options:this.members},
+          { name: "member", height: 60, map_to: "member", type: "multiselect", options:this.members, label:"member.member_name"},
           { name: "priority", height: 22, map_to: "status", type: "select",
             options: [
               { key: "todo", label: "예정" },
@@ -296,7 +297,7 @@ export default {
 
       gantt.attachEvent("onTaskCreated", (task) => {
         task.project_manager = this.$store.state.selectedProject.project_manager;
-        task.member = this.members;
+        task.member = [];
         task.text='';
         return true;
       });
@@ -308,12 +309,9 @@ export default {
         return task.text;
       };
 
-
-
       gantt.templates.task_text = function(start,end,task){
       return task.text;  
       };
-
       gantt.attachEvent("onTaskLoading", function(task) {
         if (task.end_date) {
           task.end_date.setHours(23, 59, 59);
@@ -336,7 +334,6 @@ export default {
           member_name: task.member.member_name,
           content: task.content
         };
-        console.log("샌드테스크", sendtask);
         //날짜 검사
         const StartedprojectDate = this.project.start_date;
         const EndedprojectDate = this.project.due_date;
@@ -410,7 +407,6 @@ export default {
       },
 
       set_value: function (node, value, ev, sns) {
-        console.log(value);
   // node 및 관련 스타일 설정
   node.style.overflow = "visible";
   node.parentNode.style.overflow = "visible";
@@ -477,6 +473,10 @@ get_value: function (node, ev, sns) {
 }
 .hide-add-button .gantt_grid_scale .gantt_grid_head_add {
     display: none;
+}
+
+.gantt_grid_scale .gantt_grid_head_cell{
+  color: #706f6f;
 }
 
 .chosen-container-multi .chosen-choices{
